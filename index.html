@@ -1,0 +1,274 @@
+<html>
+    <head>
+<!-- Load c3.css -->
+<link href="c3.css" rel="stylesheet">
+
+    </head>
+    <body>
+        <p>Preservation and Software Quality ....</p>
+
+        <p>Data on the <a href="https://osf.io/xfws6/">project page</a> hosted on the Open Science Framework.</p>
+
+        <a href="https://osf.io/xzhau/">Survey Questions</a> (PDF).
+<!-- Load d3.js and c3.js -->
+<script src="d3.v3.min.js"></script>
+<script src="c3.min.js"></script>
+
+        <h1>Tools/Usefulness/Sort</h1>
+
+        <h1>Researcher Behavior</h1>
+
+        <h3>How familiar are you with tools used to share, publish, cite and preserve data or software?</h3>
+        <div id="res"></div>
+    <script>
+        var chart_res = c3.generate({
+            bindto: "#res",
+            data: {
+                columns:[
+                ['Extremely familiar', 56],
+                ['Moderately familiar', 512],
+                ['Not familiar at all', 240],
+                ['Slightly familiar', 421],
+                ['Very familiar', 199],
+                ['no answer', 426],
+                ],
+                type: 'pie',
+                order: null
+            }});
+    </script>
+
+    <h3>Do you anticipate publishing or sharing your own data or code over the next five years?</h3>
+            <div id="res_pubshare_5"></div>
+    <script>
+        var chart_res_pubshare_5 = c3.generate({
+            bindto: "#res_pubshare_5",
+            data: {
+                columns:[
+['Definitely will', 761],
+['Definitely will not', 28],
+['Might or might not', 178],
+['Probably will', 366],
+['Probably will not', 98],
+['no answer', 423],
+                ],
+                type: 'pie',
+                order: null
+            }});
+    </script>
+
+    <h3>In the past, how often have you made your research data free to access, reuse, repurpose, and redistribute?</h3>
+    <div id="res_open_data"></div>
+    <script>
+        var res_open_data = c3.generate({
+            bindto: "#res_open_data",
+            data: {
+                type: 'pie',
+                order: null,
+                columns:[
+['About Half the Time', 203],
+['Always', 226],
+['Never', 137],
+['Seldom', 373],
+['Usually', 480],
+['No Answer', 435]
+]}});
+    </script>
+
+    <h3>res_pubshare Is any of your data or code published or shared now on a repository or website?</h3>
+    <div id="res_pubshare"></div>
+    <script>
+        var res_pubshare = c3.generate({
+            bindto: "#res_pubshare",
+            data: {
+                type: 'pie',
+                order: null,
+                columns:[
+['A little', 436],
+['About Half', 186],
+['All that can be', 253],
+['Most', 303],
+['None', 242],
+['No Answer', 434]
+]}});
+    </script>
+
+    <h3>res_open_data3 In the past three years, have you or your research group made publicly accessible the following items through your or your institution's website or a third-party repository?</h3>
+    <div id="res_open_data3"></div>
+    <script>
+        var res_open_data3 = c3.generate({
+            bindto: "#res_open_data3",
+            axis: {
+                x: { type: 'category'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                columns:[
+                    ['x', 'Raw data', 'Structured databases', 'Processed data', 'Figure/Plot/Table data', 'Software'],
+                    ['count', 502, 280, 721, 685, 581]
+]}});
+    </script>
+
+    <h3>res_tools_share Do you need better tools to share, re-use, cite, publish or preserve your own or others' Data and/or Software?</h3>
+    <div id="res_tools_share"></div>
+    <script>
+        var res_tools_share = c3.generate({
+            bindto: "#res_tools_share",
+            axis: {
+                x: { type: 'category'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                rows: [
+                    ['x', 'Data', 'Software'],
+                    ['to share', 719, 295],
+                    ['to re-use', 535, 279],
+                    ['to cite', 454, 269],
+                    ['to publish', 498, 259],
+                    ['to preserve', 815, 378]
+]}});
+    </script>
+
+    <h3>res_keywords When asked to submit keywords to describe your own or others' research is it usually:</h3>
+    <div id="res_keywords"></div>
+
+    <script>
+        var res_keywords = c3.generate({
+            bindto: "#res_keywords",
+            data: {
+                type: 'pie',
+                order: null,
+                columns:[
+['Extremely difficult', 20],
+['Extremely easy', 209],
+['I\'ve never had to submit keywords to describe my work', 48],
+['Moderately difficult', 267],
+['Moderately easy', 857],
+['No Answer', 453]
+]}});
+    </script>
+
+    <h3>res_keywords_avail When asked to submit keywords to describe your own or others' resarch how accurately do the terms available usually describe your work?</h3>
+    <div id="res_keywords_avail"></div>
+
+    <script>
+        var res_keywords_avail = c3.generate({
+            bindto: "#res_keywords_avail",
+            data: {
+                type: 'pie',
+                order: null,
+                columns:[
+['I\'ve never had to submit keywords to describe my work', 51],
+['Not Accurately at all', 20],
+['Not Very Accurately', 161],
+['Somewhat accurately', 989],
+['Very accurately', 176],
+['No Answer', 457]
+]}});
+    </script>
+
+    <h3>res_employ_open Does your employer require you to make any of your publications or data 
+        openly available?</h3>
+    <div id="res_employ_open"></div>
+
+    <script>
+        var res_employ_open = c3.generate({
+            bindto: "#res_employ_open",
+            data: {
+                type: 'pie',
+                order: null,
+                columns:[
+['No', 724],
+['Not Yet, but they may in the future', 438],
+['Yes', 233],
+['No Answer', 459]
+]}});
+    </script>
+
+    <h3>res_fund_open Do any of the organizations who fund your work require you to make any of your
+        publications or data openly available?</h3>
+    <div id="res_fund_open"></div>
+
+    <script>
+        var res_fund_open = c3.generate({
+            bindto: "#res_fund_open",
+            data: {
+                type: 'pie',
+                order: null,
+                columns:[
+['No', 210],
+['Sometimes', 414],
+['Yes', 775],
+['No Answer', 455]
+]}});
+    </script>
+
+
+    <h3>res_pub_infrastruct In your   estimation, which of the following currently have the infrastructure 
+required   to provide long-term public
+access to your research data?</h3>
+    <div id="res_pub_infrastruct"></div>
+
+    <script>
+    </script>
+
+
+        <h1>Developer Behavior</h1>
+
+        <!--
+        <h1>Participation</h1>
+        <p>Answers for this section of the survey were not released publically.</p>
+
+        <div id="chart"></div>
+        <div id="chart2"></div>
+    <script>
+        var chart = c3.generate({
+    bindto: '#chart',
+    data: {
+      columns: [
+        ['x',    'Q1','Q2','Q3','Q89','Q5','Q6'],
+        ['data1', 30, 200, 100, 400, 150, 250],
+        ['data2', 50, 20, 10, 40, 15, 25]
+      ],
+        x: 'x',
+        type: 'bar',
+        order: null,
+        groups: [['data1', 'data2']]
+    },
+            axis: {
+                x: { type: 'category'}
+            }
+});
+        var chart2 = c3.generate({
+    bindto: '#chart2',
+    data: {
+      columns: [
+        ['x',    'Q1','Q2','Q3','Q89','Q5','Q6'],
+        ['data1', 30, 200, 100, 400, 150, 250],
+        ['data2', 50, 20, 10, 40, 15, 25]
+      ],
+        x: 'x',
+        type: 'bar',
+        order: null,
+        groups: [['data1', 'data2']]
+    },
+            axis: {
+                x: { type: 'category'}
+            }
+});
+setTimeout(function () {
+    chart.load({
+        columns: [
+            ['x', 'www.siteA.com', 'www.siteB.com', 'www.siteC.com', 'www.siteD.com'],
+            ['data1', 130, 200, 150, 350],
+            ['data2', 190, 180, 190, 140],
+        ],
+    });
+}, 10000);
+    </script>
+    -->
+    </body>
+</html>
