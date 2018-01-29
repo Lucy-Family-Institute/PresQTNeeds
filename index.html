@@ -13,6 +13,19 @@
 <!-- Load d3.js and c3.js -->
 <script src="d3.v3.min.js"></script>
 <script src="c3.min.js"></script>
+<script>
+var charts = {}
+
+var make_pie = function (id, datalist) {
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        data: {
+            type: 'pie',
+            order: null,
+            columns: datalist
+        }})
+}
+</script>
 
         <h1>Tools/Usefulness/Sort</h1>
 
@@ -21,75 +34,53 @@
         <h3>How familiar are you with tools used to share, publish, cite and preserve data or software?</h3>
         <div id="res"></div>
     <script>
-        var chart_res = c3.generate({
-            bindto: "#res",
-            data: {
-                columns:[
+        make_pie('res',[
                 ['Extremely familiar', 56],
                 ['Moderately familiar', 512],
                 ['Not familiar at all', 240],
                 ['Slightly familiar', 421],
                 ['Very familiar', 199],
                 ['no answer', 426],
-                ],
-                type: 'pie',
-                order: null
-            }});
+                ]);
     </script>
 
     <h3>Do you anticipate publishing or sharing your own data or code over the next five years?</h3>
             <div id="res_pubshare_5"></div>
     <script>
-        var chart_res_pubshare_5 = c3.generate({
-            bindto: "#res_pubshare_5",
-            data: {
-                columns:[
+        make_pie('chart_res_pubshare_5',[
 ['Definitely will', 761],
 ['Definitely will not', 28],
 ['Might or might not', 178],
 ['Probably will', 366],
 ['Probably will not', 98],
-['no answer', 423],
-                ],
-                type: 'pie',
-                order: null
-            }});
+['no answer', 423]
+]);
     </script>
 
     <h3>In the past, how often have you made your research data free to access, reuse, repurpose, and redistribute?</h3>
     <div id="res_open_data"></div>
     <script>
-        var res_open_data = c3.generate({
-            bindto: "#res_open_data",
-            data: {
-                type: 'pie',
-                order: null,
-                columns:[
+        make_pie('res_open_data',[
 ['About Half the Time', 203],
 ['Always', 226],
 ['Never', 137],
 ['Seldom', 373],
 ['Usually', 480],
 ['No Answer', 435]
-]}});
+]);
     </script>
 
     <h3>res_pubshare Is any of your data or code published or shared now on a repository or website?</h3>
     <div id="res_pubshare"></div>
     <script>
-        var res_pubshare = c3.generate({
-            bindto: "#res_pubshare",
-            data: {
-                type: 'pie',
-                order: null,
-                columns:[
+        make_pie('res_pubshare',[
 ['A little', 436],
 ['About Half', 186],
 ['All that can be', 253],
 ['Most', 303],
 ['None', 242],
 ['No Answer', 434]
-]}});
+]);
     </script>
 
     <h3>res_open_data3 In the past three years, have you or your research group made publicly accessible the following items through your or your institution's website or a third-party repository?</h3>
@@ -136,38 +127,28 @@
     <div id="res_keywords"></div>
 
     <script>
-        var res_keywords = c3.generate({
-            bindto: "#res_keywords",
-            data: {
-                type: 'pie',
-                order: null,
-                columns:[
+        make_pie('res_keywords',[
 ['Extremely difficult', 20],
 ['Extremely easy', 209],
 ['I\'ve never had to submit keywords to describe my work', 48],
 ['Moderately difficult', 267],
 ['Moderately easy', 857],
 ['No Answer', 453]
-]}});
+]);
     </script>
 
     <h3>res_keywords_avail When asked to submit keywords to describe your own or others' resarch how accurately do the terms available usually describe your work?</h3>
     <div id="res_keywords_avail"></div>
 
     <script>
-        var res_keywords_avail = c3.generate({
-            bindto: "#res_keywords_avail",
-            data: {
-                type: 'pie',
-                order: null,
-                columns:[
+        make_pie('res_keywords_avail',[
 ['I\'ve never had to submit keywords to describe my work', 51],
 ['Not Accurately at all', 20],
 ['Not Very Accurately', 161],
 ['Somewhat accurately', 989],
 ['Very accurately', 176],
 ['No Answer', 457]
-]}});
+]);
     </script>
 
     <h3>res_employ_open Does your employer require you to make any of your publications or data 
@@ -175,17 +156,12 @@
     <div id="res_employ_open"></div>
 
     <script>
-        var res_employ_open = c3.generate({
-            bindto: "#res_employ_open",
-            data: {
-                type: 'pie',
-                order: null,
-                columns:[
+        make_pie('res_employ_open',[
 ['No', 724],
 ['Not Yet, but they may in the future', 438],
 ['Yes', 233],
 ['No Answer', 459]
-]}});
+]);
     </script>
 
     <h3>res_fund_open Do any of the organizations who fund your work require you to make any of your
@@ -193,17 +169,12 @@
     <div id="res_fund_open"></div>
 
     <script>
-        var res_fund_open = c3.generate({
-            bindto: "#res_fund_open",
-            data: {
-                type: 'pie',
-                order: null,
-                columns:[
+        make_pie('res_fund_open',[
 ['No', 210],
 ['Sometimes', 414],
 ['Yes', 775],
 ['No Answer', 455]
-]}});
+]);
     </script>
 
 
@@ -213,10 +184,271 @@ access to your research data?</h3>
     <div id="res_pub_infrastruct"></div>
 
     <script>
+        var res_pub_infrastruct = c3.generate({
+            bindto: "#res_pub_infrastruct",
+            axis: {
+                x: { type: 'category'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                rows: [
+                    ['x', 'Count', 'No Answer'],
+                    ['Your research group', 296, 1558],
+                    ['Your institution',572, 1282],
+                    ['Your funding agency',280, 1574],
+                    ['Third-party repositories',736, 1118],
+                    ['Journal publishers', 509, 1345]
+]}});
+    </script>
+
+    <h3>res_metadata Do you actively create and manage metadata to make sharing, finding, or 
+        documenting provenance of your own or others' data or code easier?</h3>
+    <div id="res_metadata"></div>
+
+    <script>
+        make_pie("res_metadata", [
+['About half the time', 67],
+['Always', 85],
+['Most of the time', 223],
+['Never', 398],
+['Sometimes', 457],
+['What\'s Metadata?', 139],
+['No Answer', 485]
+]);
+    </script>
+
+    <h3>res_tools How important to your work are Web-based applications that provide access to the 
+following specialized resources?</h3>
+    <div id="res_tools"></div>
+
+    <script>
+        var res_tools = c3.generate({
+            bindto: "#res_tools",
+            axis: {
+                x: { type: 'category'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                groups: [['Extremely important', 'Important', 'Not at all Important', 'Unimportant', 'No Answer']],
+                rows:[
+                    ['x', 'Extremely important', 'Important', 'Not at all Important', 'Unimportant', 'No Answer'],
+                    ['Computational tools', 272, 558, 207, 260, 557],
+                    ['Data collections', 426, 560, 118, 198, 552],
+                    ['Data analysis', 290, 567, 184, 254, 559],
+                    ['Simplified interfaces', 197, 426, 334, 339, 558],
+                    ['Platforms', 274, 606, 120, 292, 562],
+                    ['Finding Articles', 595, 536, 47, 124, 552],
+                    ['Rapidly Publishing', 174, 527, 137, 453, 563],
+                    ['Workflows', 146, 470, 247, 421, 570],
+                    ['Instruments', 241, 260, 499, 289, 565],
+                    ['Educational tools', 189, 590, 177, 334, 564],
+                    ['Citizen science', 111, 445, 288, 446, 564]
+]}});
+
+    </script>
+
+    <h3>res_code Do you create and/or use software, code, or scripts in your research?</h3>
+    <div id="res_code"></div>
+
+    <script>make_pie('res_code', [
+['About half the time', 84],
+['Always', 547],
+['Most of the time', 257],
+['Never', 159],
+['Sometimes', 288],
+['No answer', 519]]);
+    </script>
+
+    <h3>res_author_sw Have you ever authored software, code or scripts to analyze or produce your 
+        data?</h3>
+    <div id="res_author_sw"></div>
+
+    <script>make_pie('res_author_sw', [
+['Can\'t Remember', 37],
+['No', 394],
+['Yes', 905],
+['No answer', 518]]);
     </script>
 
 
+    <h3>res_hire_swdev Have you ever hired or supervised someone to author software code or scripts 
+        to analyze or produce your data?</h3>
+    <div id="res_hire_swdev"></div>
+
+    <script>make_pie('res_hire_swdev', [
+['Can\'t remember', 22],
+['No', 455],
+['Yes', 860],
+['No answer', 517]]);
+    </script>
+
+
+    <h3>res_reproduce For others to reproduce your results would they need your software, code or 
+        scripts ?</h3>
+    <div id="res_reproduce"></div>
+
+    <script>make_pie('res_reproduce', [
+['About half the time', 146],
+['Always', 155],
+['Most of the time', 315],
+['Never', 316],
+['Sometimes', 400],
+['No answer', 522]]);
+    </script>
+
+    <h3>res_external_sw Do you use or revise commercial and/or freeware software, scripts, or tools to 
+analyze or produce your data more often than writing new code or hiring someone to write 
+custom software to analyze or produce data for your project(s)?</h3>
+    <div id="res_external_sw"></div>
+
+    <script>make_pie('res_external_sw', [
+['About half the time', 227],
+['Always', 95],
+['Most of the time', 291],
+['Never', 281],
+['Sometimes', 428],
+['No answer', 532]]);
+    </script>
+
         <h1>Developer Behavior</h1>
+
+        <h3>dev The next questions are for those who develop, administer or maintain software and/or 
+systems used to share, publish or preserve data or software. Are these sorts of tasks your 
+responsibility?</h3>
+        <div id="dev"></div>
+
+    <script>make_pie('dev', [
+['Never', 798],
+['Occasionally', 276],
+['Yes', 213],
+['No answer', 567]]);
+    </script>
+
+    <h3>dev_code_verCon Do you collaboratively develop and/or publicly share code in an version 
+        control repository like GitHub or bitbucket?</h3>
+    <div id="dev_code_verCon"></div>
+
+    <script>make_pie('dev_code_verCon', [
+['No, I only distribute binaries', 16],
+['No, it\'s all managed at the team or dev level internally on developer machines or our local filesystems', 73],
+['Prefer not to Answer', 19],
+['Yes, collaboratively develop and publicly share in a code repository', 112],
+['Yes, manage in a code repository but don\'t make public', 47],
+['No answer', 9]]);
+    </script>
+
+    <h3>dev_sw_dams Do you develop, administer, maintain or support any (select any that apply):</h3>
+    <div id="dev_sw_dams"></div>
+
+    <script>
+        var dev_sw_dams = c3.generate({
+            bindto: "#dev_sw_dams",
+            axis: {
+                x: { type: 'category'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                groups: [['Develop', 'Administer', 'Maintain', 'Support']],
+                rows:[
+                    ['x', 'Develop', 'Administer', 'Maintain', 'Support'],
+                    ['Share', 39, 51, 46, 43],
+                    ['Publish or cite', 18, 33, 25, 28],
+                    ['Preserve', 24, 38, 38, 38],
+                    ['Other', 86, 64, 67, 64]
+]}});
+    </script>
+
+    <h3>dev_sw_eol How long do you expect people to use the software you
+develop, administer, 
+maintain or support ?</h3>
+    <div id="dev_sw_eol"></div>
+
+    <script>make_pie('dev_sw_eol', [
+['10 years', 15],
+['5-10 years', 104],
+['>10 years', 48],
+['less than 5 years', 78],
+['No answer', 31]]);
+    </script>
+
+    <h3>dev_user_count For the typical software you
+develop, administer, maintain or support, how 
+many users are there:</h3>
+    <div id="dev_user_count"></div>
+
+    <script>make_pie('dev_user_count', [
+['less than 50 users', 141],
+['More than 50, less than 500 users', 55],
+['500-1000 users', 19],
+['over 1000 users', 13],
+['over 10,000 users', 6],
+['over 50,000 users', 3],
+['No answer', 39]]);
+    </script>
+
+    <h3>dev_license How do you typically license the software you develop? Select all that apply:</h3>
+    <div id="dev_license"></div>
+
+    <script>
+        var dev_license = c3.generate({
+            bindto: "#dev_license",
+            axis: {
+                x: { type: 'category'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                rows:[
+                    ['x', 'Count'],
+                    ['GPL', 87],
+                    ['CC', 50],
+                    ['Apache', 23],
+                    ['MIT', 34],
+                    ['Other (Please Name)', 35]
+]}});
+     </script>
+<!-- select dev_license_5_TEXT,count(*) from data where dev in ("yes", "Occasionally") group by dev_license_5_TEXT;
+|246
+BSD|6
+BSD 3-clause|2
+BSD3|1
+BSD3 like|1
+Commercial|1
+ECL (like Apache)|1
+I don't|1
+I don't licence it|1
+I don't, mostly shared within the lab and colleagues|1
+I just send it to people if they want it|1
+MyReviewers,LLC|1
+N/A|1
+Not licensed|1
+This is done by the system administrator; he typically uses Apache|1
+UC Regents|1
+UCAR internally written or none|1
+bsd|1
+i don't license it|1
+n/a|1
+not applicable, since I only store raw data and use "tools" developed by other people|1
+not at all|1
+not available for license|1
+unlicensed|1
+we don't license|1
+-->
+
+<h3>dev_code_container Have you containerized any code to make sharing or distribution easier?</h3>
+<div id="dev_code_container"></div>
+
+    <script>make_pie('dev_code_container', [['No', 92], ['Yes', 33]]);
+    </script>
+
+     <!-- 
 
         <!--
         <h1>Participation</h1>
