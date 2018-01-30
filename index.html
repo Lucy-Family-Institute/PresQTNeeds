@@ -5,11 +5,15 @@
 
     </head>
     <body>
+        <h1>PresQT Survey Results</h1>
         <p>Preservation and Software Quality ....</p>
 
-        <p>Data on the <a href="https://osf.io/xfws6/">project page</a> hosted on the Open Science Framework.</p>
+        <p>The survey and released data are available on the <a href="https://osf.io/xfws6/">project page</a>.</p>
 
-        <a href="https://osf.io/xzhau/">Survey Questions</a> (PDF).
+        <ul>
+            <li><a href="https://osf.io/xzhau/">Survey Questions</a> (PDF)</li>
+            <li><a href="https://osf.io/6v325/">Data</a></li>
+        </ul>
 <!-- Load d3.js and c3.js -->
 <script src="d3.v3.min.js"></script>
 <script src="c3.min.js"></script>
@@ -37,10 +41,50 @@ var make_pie = function (id, datalist) {
 
         <h1>Tools/Usefulness/Sort</h1>
 
-        <h3>tool_use_matrix</h3>
+        <h3>tools_use_matrix Indicate whether implementation or integration of tools like those below would 
+ease your path to publishing, sharing, curating, or reusing data or software:</h3>
+        <div id="tools_use_matrix"></div>
 
-        <h3>tools_data_preserv</h3>
-        sample some of the responses ~5
+    <script>
+    var tools_use_matrix = c3.generate({
+        bindto: "#tools_use_matrix",
+        axis: {
+            x: { type: 'category'},
+            rotated: true
+        },
+        data: {
+            type: 'bar',
+            order: null,
+            colors: {
+                'Extremely useful': colorlist[0],
+                'Useful': colorlist[1],
+                'Somewhat useful': colorlist[2],
+                'Not useful': colorlist[3]
+            },
+            x: 'x',
+            groups: [['Extremely useful', 'Useful', 'Somewhat useful',  'Not useful']],
+            rows:[
+                ['x', 'Extremely useful', 'Useful', 'Somewhat useful',  'Not useful'],
+                ['Provenance', 554, 554, 276, 86],
+                ['Workflow', 516, 533, 301, 117],
+                ['Fixity', 341, 580, 384, 148],
+                ['Assignment', 275, 522, 451, 209],
+                ['Profile Based Recommender', 156, 469, 541, 292],
+                ['De-identification', 325, 390, 380, 368],
+                ['Quality', 338, 559, 381, 184]
+           ]}});
+    </script>
+
+        <h3>tools_data_preserv Do you have a data or software preservation quality tool need this project could help you develop ? If so, please describe:</h3>
+
+        <p>Sample of responses:</p>
+        <ul>
+            <li> There is a great need to develop tools for capturing the provenance of biomodels (e.g. data sources and assumptions used to build models) to increase the comprehensibility of models and make models easier to modify and combine</li>
+            <li>Any tools for developing and sharing ontologies in OWL.</li>
+            <li>Providing permanent PI accounts on open git repos (e.g., bitbucket, github. etc) would go a long way to preserving data.   This is not so much the lack of a tool, but the lack of permanent funding to use a tool.</li>
+            <li>Preservation of analytical data from archaeological assemblages</li>
+            <li>Different types of phylogenomic data (sequences, SNPs) and data processing and analysis pipelines.</li>
+        </ul>
 
 
         <h1>Researcher Behavior</h1>
@@ -251,6 +295,7 @@ following specialized resources?</h3>
         var res_tools = c3.generate({
             bindto: "#res_tools",
             axis: {
+                rotated: true,
                 x: { type: 'category'}
             },
             data: {
