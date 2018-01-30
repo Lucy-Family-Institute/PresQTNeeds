@@ -16,11 +16,19 @@
 <script>
 var charts = {}
 
+var colorlist = ["#16a085", "#aac7a6", "#ffc300", "#aa8888", "#c70039", "#900c3f", "#555555"]
+
+
 var make_pie = function (id, datalist) {
+    var colors = {}
+    for(i=0; i < datalist.length; i++){
+        colors[datalist[i][0]] = colorlist[i]
+    }
     charts[id] = c3.generate({
         bindto: "#" + id,
         data: {
             type: 'pie',
+            colors: colors,
             order: null,
             columns: datalist
         }})
@@ -29,31 +37,37 @@ var make_pie = function (id, datalist) {
 
         <h1>Tools/Usefulness/Sort</h1>
 
+        <h3>tool_use_matrix</h3>
+
+        <h3>tools_data_preserv</h3>
+        sample some of the responses ~5
+
+
         <h1>Researcher Behavior</h1>
 
         <h3>How familiar are you with tools used to share, publish, cite and preserve data or software?</h3>
         <div id="res"></div>
     <script>
         make_pie('res',[
-                ['Extremely familiar', 56],
-                ['Moderately familiar', 512],
-                ['Not familiar at all', 240],
-                ['Slightly familiar', 421],
-                ['Very familiar', 199],
-                ['no answer', 426],
+                ['Extremely familiar', 56], // green
+                ['Very familiar', 199],     //  cyan
+                ['Moderately familiar', 512], // yellow
+                ['Slightly familiar', 421],  //  pink
+                ['Not familiar at all', 240] // red
+                //['no answer', 426],
                 ]);
     </script>
 
     <h3>Do you anticipate publishing or sharing your own data or code over the next five years?</h3>
             <div id="res_pubshare_5"></div>
     <script>
-        make_pie('chart_res_pubshare_5',[
+        make_pie('res_pubshare_5',[
 ['Definitely will', 761],
-['Definitely will not', 28],
-['Might or might not', 178],
 ['Probably will', 366],
+['Might or might not', 178],
 ['Probably will not', 98],
-['no answer', 423]
+['Definitely will not', 28]
+//['no answer', 423]
 ]);
     </script>
 
@@ -61,12 +75,12 @@ var make_pie = function (id, datalist) {
     <div id="res_open_data"></div>
     <script>
         make_pie('res_open_data',[
-['About Half the Time', 203],
 ['Always', 226],
-['Never', 137],
-['Seldom', 373],
 ['Usually', 480],
-['No Answer', 435]
+['About Half the Time', 203],
+['Seldom', 373],
+['Never', 137]
+//['No Answer', 435]
 ]);
     </script>
 
@@ -74,12 +88,12 @@ var make_pie = function (id, datalist) {
     <div id="res_pubshare"></div>
     <script>
         make_pie('res_pubshare',[
-['A little', 436],
-['About Half', 186],
 ['All that can be', 253],
 ['Most', 303],
-['None', 242],
-['No Answer', 434]
+['About Half', 186],
+['A little', 436],
+['None', 242]
+//['No Answer', 434]
 ]);
     </script>
 
@@ -112,8 +126,15 @@ var make_pie = function (id, datalist) {
             data: {
                 type: 'bar',
                 order: null,
+                colors: {
+                    'to share': colorlist[0],
+                    'to re-use': colorlist[1],
+                    'to cite': colorlist[2],
+                    'to publish': colorlist[3],
+                    'to preserve': colorlist[4]
+                },
                 x: 'x',
-                rows: [
+                columns: [
                     ['x', 'Data', 'Software'],
                     ['to share', 719, 295],
                     ['to re-use', 535, 279],
@@ -128,12 +149,12 @@ var make_pie = function (id, datalist) {
 
     <script>
         make_pie('res_keywords',[
-['Extremely difficult', 20],
 ['Extremely easy', 209],
-['I\'ve never had to submit keywords to describe my work', 48],
-['Moderately difficult', 267],
 ['Moderately easy', 857],
-['No Answer', 453]
+['Moderately difficult', 267],
+['Extremely difficult', 20],
+['I\'ve never had to submit keywords to describe my work', 48]
+//['No Answer', 453]
 ]);
     </script>
 
@@ -142,12 +163,12 @@ var make_pie = function (id, datalist) {
 
     <script>
         make_pie('res_keywords_avail',[
-['I\'ve never had to submit keywords to describe my work', 51],
-['Not Accurately at all', 20],
-['Not Very Accurately', 161],
-['Somewhat accurately', 989],
 ['Very accurately', 176],
-['No Answer', 457]
+['Somewhat accurately', 989],
+['Not Very Accurately', 161],
+['Not Accurately at all', 20],
+['I\'ve never had to submit keywords to describe my work', 51]
+//['No Answer', 457]
 ]);
     </script>
 
@@ -157,10 +178,10 @@ var make_pie = function (id, datalist) {
 
     <script>
         make_pie('res_employ_open',[
-['No', 724],
-['Not Yet, but they may in the future', 438],
 ['Yes', 233],
-['No Answer', 459]
+['Not Yet, but they may in the future', 438],
+['No', 724]
+//['No Answer', 459]
 ]);
     </script>
 
@@ -170,10 +191,10 @@ var make_pie = function (id, datalist) {
 
     <script>
         make_pie('res_fund_open',[
-['No', 210],
-['Sometimes', 414],
 ['Yes', 775],
-['No Answer', 455]
+['Sometimes', 414],
+['No', 210]
+//['No Answer', 455]
 ]);
     </script>
 
@@ -192,14 +213,17 @@ access to your research data?</h3>
             data: {
                 type: 'bar',
                 order: null,
+                colors: {
+                    Count: colorlist[0]
+                },
                 x: 'x',
                 rows: [
-                    ['x', 'Count', 'No Answer'],
-                    ['Your research group', 296, 1558],
-                    ['Your institution',572, 1282],
-                    ['Your funding agency',280, 1574],
-                    ['Third-party repositories',736, 1118],
-                    ['Journal publishers', 509, 1345]
+                    ['x', 'Count'],
+                    ['Your research group', 296 ], //1558],
+                    ['Your institution',572 ], //1282],
+                    ['Your funding agency',280], //1574],
+                    ['Third-party repositories',736], //1118],
+                    ['Journal publishers', 509] //1345]
 ]}});
     </script>
 
@@ -209,13 +233,13 @@ access to your research data?</h3>
 
     <script>
         make_pie("res_metadata", [
-['About half the time', 67],
 ['Always', 85],
 ['Most of the time', 223],
-['Never', 398],
+['About half the time', 67],
 ['Sometimes', 457],
-['What\'s Metadata?', 139],
-['No Answer', 485]
+['Never', 398],
+['What\'s Metadata?', 139]
+//['No Answer', 485]
 ]);
     </script>
 
@@ -232,21 +256,28 @@ following specialized resources?</h3>
             data: {
                 type: 'bar',
                 order: null,
+                colors: {
+                    'Extremely important': colorlist[0],
+                    'Important': colorlist[1],
+                    'Unimportant': colorlist[2],
+                    'Not at all Important': colorlist[3]
+                },
                 x: 'x',
-                groups: [['Extremely important', 'Important', 'Not at all Important', 'Unimportant', 'No Answer']],
+                groups: [['Extremely important', 'Important', 'Unimportant',  'Not at all Important']],
                 rows:[
-                    ['x', 'Extremely important', 'Important', 'Not at all Important', 'Unimportant', 'No Answer'],
-                    ['Computational tools', 272, 558, 207, 260, 557],
-                    ['Data collections', 426, 560, 118, 198, 552],
-                    ['Data analysis', 290, 567, 184, 254, 559],
-                    ['Simplified interfaces', 197, 426, 334, 339, 558],
-                    ['Platforms', 274, 606, 120, 292, 562],
-                    ['Finding Articles', 595, 536, 47, 124, 552],
-                    ['Rapidly Publishing', 174, 527, 137, 453, 563],
-                    ['Workflows', 146, 470, 247, 421, 570],
-                    ['Instruments', 241, 260, 499, 289, 565],
-                    ['Educational tools', 189, 590, 177, 334, 564],
-                    ['Citizen science', 111, 445, 288, 446, 564]
+                    // TODO: reorder columns
+                    ['x', 'Extremely important', 'Important', 'Unimportant',  'Not at all Important'],
+                    ['Computational tools', 272, 558, 260, 207],
+                    ['Data collections', 426, 560, 198, 118],
+                    ['Data analysis', 290, 567, 254, 184],
+                    ['Simplified interfaces', 197, 426, 339, 334],
+                    ['Platforms', 274, 606, 292, 120],
+                    ['Finding Articles', 595, 536, 124, 47],
+                    ['Rapidly Publishing', 174, 527, 453, 137],
+                    ['Workflows', 146, 470, 421, 247],
+                    ['Instruments', 241, 260, 289, 499],
+                    ['Educational tools', 189, 590, 334, 177],
+                    ['Citizen science', 111, 445, 446, 288]
 ]}});
 
     </script>
@@ -255,12 +286,13 @@ following specialized resources?</h3>
     <div id="res_code"></div>
 
     <script>make_pie('res_code', [
-['About half the time', 84],
 ['Always', 547],
 ['Most of the time', 257],
-['Never', 159],
+['About half the time', 84],
 ['Sometimes', 288],
-['No answer', 519]]);
+['Never', 159]
+//['No answer', 519]
+]);
     </script>
 
     <h3>res_author_sw Have you ever authored software, code or scripts to analyze or produce your 
@@ -268,10 +300,11 @@ following specialized resources?</h3>
     <div id="res_author_sw"></div>
 
     <script>make_pie('res_author_sw', [
-['Can\'t Remember', 37],
-['No', 394],
 ['Yes', 905],
-['No answer', 518]]);
+['Can\'t Remember', 37],
+['No', 394]
+//['No answer', 518]
+]);
     </script>
 
 
@@ -280,10 +313,11 @@ following specialized resources?</h3>
     <div id="res_hire_swdev"></div>
 
     <script>make_pie('res_hire_swdev', [
-['Can\'t remember', 22],
-['No', 455],
 ['Yes', 860],
-['No answer', 517]]);
+['Can\'t remember', 22],
+['No', 455]
+//['No answer', 517]
+]);
     </script>
 
 
@@ -292,12 +326,13 @@ following specialized resources?</h3>
     <div id="res_reproduce"></div>
 
     <script>make_pie('res_reproduce', [
-['About half the time', 146],
 ['Always', 155],
 ['Most of the time', 315],
-['Never', 316],
+['About half the time', 146],
 ['Sometimes', 400],
-['No answer', 522]]);
+['Never', 316]
+//['No answer', 522]
+]);
     </script>
 
     <h3>res_external_sw Do you use or revise commercial and/or freeware software, scripts, or tools to 
@@ -306,12 +341,13 @@ custom software to analyze or produce data for your project(s)?</h3>
     <div id="res_external_sw"></div>
 
     <script>make_pie('res_external_sw', [
-['About half the time', 227],
 ['Always', 95],
 ['Most of the time', 291],
-['Never', 281],
+['About half the time', 227],
 ['Sometimes', 428],
-['No answer', 532]]);
+['Never', 281]
+//['No answer', 532]
+]);
     </script>
 
         <h1>Developer Behavior</h1>
@@ -322,10 +358,11 @@ responsibility?</h3>
         <div id="dev"></div>
 
     <script>make_pie('dev', [
-['Never', 798],
-['Occasionally', 276],
 ['Yes', 213],
-['No answer', 567]]);
+['Occasionally', 276],
+['Never', 798],
+//['No answer', 567]
+]);
     </script>
 
     <h3>dev_code_verCon Do you collaboratively develop and/or publicly share code in an version 
@@ -333,12 +370,13 @@ responsibility?</h3>
     <div id="dev_code_verCon"></div>
 
     <script>make_pie('dev_code_verCon', [
-['No, I only distribute binaries', 16],
-['No, it\'s all managed at the team or dev level internally on developer machines or our local filesystems', 73],
-['Prefer not to Answer', 19],
 ['Yes, collaboratively develop and publicly share in a code repository', 112],
 ['Yes, manage in a code repository but don\'t make public', 47],
-['No answer', 9]]);
+['No, it\'s all managed at the team or dev level internally on developer machines or our local filesystems', 73],
+['No, I only distribute binaries', 16],
+['Prefer not to Answer', 19],
+//['No answer', 9]
+]);
     </script>
 
     <h3>dev_sw_dams Do you develop, administer, maintain or support any (select any that apply):</h3>
@@ -354,7 +392,12 @@ responsibility?</h3>
                 type: 'bar',
                 order: null,
                 x: 'x',
-                groups: [['Develop', 'Administer', 'Maintain', 'Support']],
+                colors: {
+                    Develop: colorlist[0],
+                    Administer: colorlist[1],
+                    Maintain: colorlist[2],
+                    Support: colorlist[3]
+                },
                 rows:[
                     ['x', 'Develop', 'Administer', 'Maintain', 'Support'],
                     ['Share', 39, 51, 46, 43],
@@ -370,11 +413,12 @@ maintain or support ?</h3>
     <div id="dev_sw_eol"></div>
 
     <script>make_pie('dev_sw_eol', [
+['>10 years', 48],
 ['10 years', 15],
 ['5-10 years', 104],
-['>10 years', 48],
-['less than 5 years', 78],
-['No answer', 31]]);
+['less than 5 years', 78]
+//['No answer', 31]
+]);
     </script>
 
     <h3>dev_user_count For the typical software you
@@ -383,13 +427,14 @@ many users are there:</h3>
     <div id="dev_user_count"></div>
 
     <script>make_pie('dev_user_count', [
-['less than 50 users', 141],
-['More than 50, less than 500 users', 55],
-['500-1000 users', 19],
-['over 1000 users', 13],
-['over 10,000 users', 6],
 ['over 50,000 users', 3],
-['No answer', 39]]);
+['over 10,000 users', 6],
+['over 1000 users', 13],
+['500-1000 users', 19],
+['More than 50, less than 500 users', 55],
+['less than 50 users', 141]
+//['No answer', 39]
+]);
     </script>
 
     <h3>dev_license How do you typically license the software you develop? Select all that apply:</h3>
@@ -403,6 +448,9 @@ many users are there:</h3>
             },
             data: {
                 type: 'bar',
+                colors: {
+                    Count: colorlist[0]
+                },
                 order: null,
                 x: 'x',
                 rows:[
@@ -445,62 +493,8 @@ we don't license|1
 <h3>dev_code_container Have you containerized any code to make sharing or distribution easier?</h3>
 <div id="dev_code_container"></div>
 
-    <script>make_pie('dev_code_container', [['No', 92], ['Yes', 33]]);
+    <script>make_pie('dev_code_container', [['Yes', 33], ['No', 92]]);
     </script>
 
-     <!-- 
-
-        <!--
-        <h1>Participation</h1>
-        <p>Answers for this section of the survey were not released publically.</p>
-
-        <div id="chart"></div>
-        <div id="chart2"></div>
-    <script>
-        var chart = c3.generate({
-    bindto: '#chart',
-    data: {
-      columns: [
-        ['x',    'Q1','Q2','Q3','Q89','Q5','Q6'],
-        ['data1', 30, 200, 100, 400, 150, 250],
-        ['data2', 50, 20, 10, 40, 15, 25]
-      ],
-        x: 'x',
-        type: 'bar',
-        order: null,
-        groups: [['data1', 'data2']]
-    },
-            axis: {
-                x: { type: 'category'}
-            }
-});
-        var chart2 = c3.generate({
-    bindto: '#chart2',
-    data: {
-      columns: [
-        ['x',    'Q1','Q2','Q3','Q89','Q5','Q6'],
-        ['data1', 30, 200, 100, 400, 150, 250],
-        ['data2', 50, 20, 10, 40, 15, 25]
-      ],
-        x: 'x',
-        type: 'bar',
-        order: null,
-        groups: [['data1', 'data2']]
-    },
-            axis: {
-                x: { type: 'category'}
-            }
-});
-setTimeout(function () {
-    chart.load({
-        columns: [
-            ['x', 'www.siteA.com', 'www.siteB.com', 'www.siteC.com', 'www.siteD.com'],
-            ['data1', 130, 200, 150, 350],
-            ['data2', 190, 180, 190, 140],
-        ],
-    });
-}, 10000);
-    </script>
-    -->
     </body>
 </html>
