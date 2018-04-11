@@ -18,7 +18,7 @@
     overflow-y: scroll;
 }
 .pie {
-    min-height: 200px;
+    min-height: 150px;
 }
 </style>
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -57,15 +57,26 @@ var charts = {}
 
 // array of # of items by list of colors to use
 var colorlist = [
-    ["#3c9ab4"],
-    ["#3c9ab4", "#f19043"],
-    ["#3c9ab4", "#e3ddcd", "#f19043"],
-    ["#2a656c", "#3c9ab4", "#f19043", "#d84d23"],
-    ["#2a656c", "#3c9ab4", "#e3ddcd", "#f19043", "#d84d23"],
-    ["#2a656c", "#3c9ab4", "#b8c6c9", "#e3ddcd", "#f19043", "#d84d23"]
+    ["#1f78b4"],
+    ['#1f78b4','#d84d23'],
+    ['#1f78b4','#e3ddcd','#d84d23'],
+    ['#1f78b4','#90abc2','#e8b093','#d84d23'],
+    ['#1f78b4','#7a9dbf','#e3ddcd','#e79877','#d84d23'],
+    ['#1f78b4','#6d96bd','#a0b6c5','#e8c2a9','#e58a66','#d84d23']
 ]
 
-var colorlist_categorical = ["#1b9e77", "#d95f02", "#7570b3", "#e72981", "#66a61e"]
+var colorlist_light = [
+    ["#99cedd"],
+    ["#99cedd", "#f8c7a1"],
+    ["#99cedd", "#f1eee6", "#f8c7a1"],
+    ["#7dc4cc", "#99cedd", "#f8c7a1", "#eca58f"],
+    ['#1f78b4','#7a9dbf','#e3ddcd','#e79877','#d84d23'],
+    ["#7dc4cc", "#99cedd", "#dbe2e3", "#f1eee6", "#f8c7a1", "#eca58f"]
+]
+
+
+
+var colorlist_categorical = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"]
 
 var make_pie_1 = function(id, datalist, colors) {
     charts[id] = c3.generate({
@@ -100,6 +111,9 @@ var make_bar_1 = function(id, datalist, colors) {
         },
         color: {
             pattern: colors
+        },
+        bar : {
+            width: { ratio: 0.6 }
         },
         x: 'x',
         data: {
@@ -143,6 +157,9 @@ ease your path to publishing, sharing, curating, or reusing data or software:
             y: { label: 'Count'},
             rotated: true
         },
+        bar : {
+            width: { ratio: 0.9 }
+        },
         data: {
             type: 'bar',
             order: null,
@@ -166,7 +183,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
            ]}});
     </script>
 
-        <h3>Do you have a data or software preservation quality tool need this project could help you develop ? If so, please describe:
+        <h3>Do you have a data or software preservation quality tool need this project could help you develop? If so, please describe:
         <small class="text-muted">(tools_data_preserv)</small>
         </h3>
 
