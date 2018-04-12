@@ -66,17 +66,17 @@ var colorlist = [
 ]
 
 var colorlist_light = [
-    ["#99cedd"],
-    ["#99cedd", "#f8c7a1"],
-    ["#99cedd", "#f1eee6", "#f8c7a1"],
-    ["#7dc4cc", "#99cedd", "#f8c7a1", "#eca58f"],
-    ['#1f78b4','#7a9dbf','#e3ddcd','#e79877','#d84d23'],
-    ["#7dc4cc", "#99cedd", "#dbe2e3", "#f1eee6", "#f8c7a1", "#eca58f"]
+    ["#7fbee9"],
+    ["#7fbee9", "#eca58f"],
+    ["#7fbee9", "#f1eee6", "#eca58f"],
+    ["#7fbee9", "#c7d4e0", "#f3d7c9", "#eca58f"],
+    ['#7fbee9','#bccedf','#f1eee6','#f3cbbb','#eca58f'],
+    ["#7fbee9", "#b6cade", "#cfdae2", "#f3e0d3", "#f1c4b2", "#eca58f"]
 ]
 
 
 
-var colorlist_categorical = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"]
+var colorlist_categorical = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"]
 
 var make_pie_1 = function(id, datalist, colors) {
     charts[id] = c3.generate({
@@ -136,6 +136,49 @@ var make_pie = function (id, datalist) {
 var make_pie_categorical = function(id, datalist) {
     make_bar_1(id, datalist, colorlist_categorical)
 }
+var importance_inv = {
+    "Extremely Useful": 0,
+    "Useful": 1,
+    "Somewhat Useful": 2,
+    "Not Useful": 3
+}
+// very specialized function for a particular set of charts
+var make_tools_bar = function(id, datalist) {
+    // data is three rows for "all", "dev", and "non-dev"
+    var newdata = [['x', 'Extremely Useful', 'Useful', 'Somewhat Useful', 'Not Useful']]
+    for(i = 0; i < datalist.length; i++){
+        var total = datalist[i].reduce(
+            (a,v) => a + (typeof v == "number" ? v : 0),
+            0)
+        console.log(total)
+        newdata.push(datalist[i].map(
+            v => typeof v == "string" ? v : ((v/total)*100).toFixed(1)
+        ))
+    }
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        size: { height: 150 },
+        axis: {
+            x: { type: 'category' },
+            y: { max: 100, padding: 0, label: 'Percent' },
+            rotated: true
+        },
+        bar: { width: { ratio: 0.9 }},
+        data: {
+            type: 'bar',
+            order: null,
+            color: function (color, d) {
+                var p = colorlist;
+                if (d.x > 0) { p = colorlist_light }
+                var v = importance_inv[d.id || d]
+                return p[3][v]
+            },
+            colors: colorlist[3],
+            x: 'x',
+            groups: [['Extremely Useful', 'Useful', 'Somewhat Useful', 'Not Useful']],
+            rows: newdata
+        }});
+}
 </script>
 
         <hr>
@@ -147,41 +190,72 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         <small class="text-muted">(tools_use_matrix)</small>
         </h3>
 
-        <div id="tools_use_matrix"></div>
+        <div>
+            <h4>Provenance</h4>
+            <div id="tools_use_matrix_provenance"></div>
+        </div>
+        <div>
+            <h4>Workflow</h4>
+            <div id="tools_use_matrix_workflow"></div>
+        </div>
+        <div>
+            <h4>Fixity</h4>
+            <div id="tools_use_matrix_fixity"></div>
+        </div>
+        <div>
+            <h4>Assignment</h4>
+            <div id="tools_use_matrix_assignment"></div>
+        </div>
+        <div>
+            <h4>Profile Based Recommender</h4>
+            <div id="tools_use_matrix_profile"></div>
+        </div>
+        <div>
+            <h4>De-identification</h4>
+            <div id="tools_use_matrix_deidentification"></div>
+        </div>
+        <div>
+            <h4>Quality</h4>
+            <div id="tools_use_matrix_quality"></div>
+        </div>
 
-    <script>
-    var tools_use_matrix = c3.generate({
-        bindto: "#tools_use_matrix",
-        axis: {
-            x: { type: 'category'},
-            y: { label: 'Count'},
-            rotated: true
-        },
-        bar : {
-            width: { ratio: 0.9 }
-        },
-        data: {
-            type: 'bar',
-            order: null,
-            colors: {
-                'Extremely useful': colorlist[3][0],
-                'Useful': colorlist[3][1],
-                'Somewhat useful': colorlist[3][2],
-                'Not useful': colorlist[3][3]
-            },
-            x: 'x',
-            groups: [['Extremely useful', 'Useful', 'Somewhat useful',  'Not useful']],
-            rows:[
-                ['x', 'Extremely useful', 'Useful', 'Somewhat useful',  'Not useful'],
-                ['Provenance', 554, 554, 276, 86],
-                ['Workflow', 516, 533, 301, 117],
-                ['Fixity', 341, 580, 384, 148],
-                ['Assignment', 275, 522, 451, 209],
-                ['Profile Based Recommender', 156, 469, 541, 292],
-                ['De-identification', 325, 390, 380, 368],
-                ['Quality', 338, 559, 381, 184]
-           ]}});
-    </script>
+<script>
+    make_tools_bar("tools_use_matrix_provenance", [
+        ['All', 554, 554, 276, 86],
+        ['Developers', 223, 177, 69, 14],
+        ['Non-Developers', 331, 377, 207, 72]
+    ])
+    make_tools_bar("tools_use_matrix_workflow", [
+        ['All', 516, 533, 301, 117],
+        ['Developers', 199, 169, 92, 23],
+        ['Non-Developers', 317, 364, 209, 94]
+    ])
+    make_tools_bar("tools_use_matrix_fixity", [
+        ['All', 341, 580, 384, 148],
+        ['Developers', 135, 195, 116, 33],
+        ['Non-Developers', 206, 385, 268, 115]
+    ])
+    make_tools_bar("tools_use_matrix_assignment", [
+        ['All', 275, 522, 451, 209],
+        ['Developers', 91, 183, 148, 60],
+        ['Non-Developers', 184, 339, 303, 149]
+    ])
+    make_tools_bar("tools_use_matrix_profile", [
+        ['All', 156, 469, 541, 292],
+        ['Developers', 49, 160, 183, 90],
+        ['Non-Developers', 107, 309, 358, 202]
+    ])
+    make_tools_bar("tools_use_matrix_deidentification", [
+        ['All', 325, 390, 380, 368],
+        ['Developers', 111, 126, 154, 112],
+        ['Non-Developers', 214, 264, 246, 256]
+    ])
+    make_tools_bar("tools_use_matrix_quality", [
+        ['All', 338, 559, 381, 184],
+        ['Developers', 129, 191, 119, 45],
+        ['Non-Developers', 209, 368, 262, 239]
+    ])
+</script>
 
         <h3>Do you have a data or software preservation quality tool need this project could help you develop? If so, please describe:
         <small class="text-muted">(tools_data_preserv)</small>
