@@ -17,6 +17,19 @@
     height: 300px;
     overflow-y: scroll;
 }
+.pie {
+    min-height: 150px;
+}
+.toolusedetail {
+    display: none;
+    flex-direction: column;
+}
+.toolusedetail.is-visible {
+    display: flex;
+}
+.toolmatrixname {
+    font-weight: bold;
+}
 </style>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-113800656-1"></script>
@@ -52,22 +65,129 @@
 <script>
 var charts = {}
 
-var colorlist = ["#16a085", "#aac7a6", "#ffc300", "#aa8888", "#c70039", "#900c3f", "#555555"]
+// array of # of items by list of colors to use
+var colorlist = [
+    ["#1f78b4"],
+    ['#1f78b4','#d84d23'],
+    ['#1f78b4','#e3ddcd','#d84d23'],
+    ['#1f78b4','#90abc2','#e8b093','#d84d23'],
+    ['#1f78b4','#7a9dbf','#e3ddcd','#e79877','#d84d23'],
+    ['#1f78b4','#6d96bd','#a0b6c5','#e8c2a9','#e58a66','#d84d23']
+]
+
+var colorlist_light = [
+    ["#7fbee9"],
+    ["#7fbee9", "#eca58f"],
+    ["#7fbee9", "#f1eee6", "#eca58f"],
+    ["#7fbee9", "#c7d4e0", "#f3d7c9", "#eca58f"],
+    ['#7fbee9','#bccedf','#f1eee6','#f3cbbb','#eca58f'],
+    ["#7fbee9", "#b6cade", "#cfdae2", "#f3e0d3", "#f1c4b2", "#eca58f"]
+]
 
 
-var make_pie = function (id, datalist) {
-    var colors = {}
-    for(i=0; i < datalist.length; i++){
-        colors[datalist[i][0]] = colorlist[i]
-    }
+
+var colorlist_categorical = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#ffff33"]
+
+var make_pie_1 = function(id, datalist, colors) {
     charts[id] = c3.generate({
         bindto: "#" + id,
         data: {
             type: 'pie',
-            colors: colors,
             order: null,
             columns: datalist
-        }})
+        },
+        color: {
+            pattern: colors
+        }
+    })
+}
+var make_bar_1 = function(id, datalist, colors) {
+    var data = [['x',' ']].concat(datalist)
+    var labels = []
+    var total = 0
+    for(i = 0; i < datalist.length; i++){
+        labels.push(datalist[i][0])
+        total += datalist[i][1]
+    }
+    for(i = 0; i < datalist.length; i++){
+        datalist[i][1] = ((datalist[i][1] / total)*100).toFixed(1)
+    }
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        axis: {
+            x: { type: 'category' },
+            y: { max: 100, padding: 0, label: "Percent (n=" + total + ")" },
+            rotated: true
+        },
+        color: {
+            pattern: colors
+        },
+        bar : {
+            width: { ratio: 0.6 }
+        },
+        x: 'x',
+        data: {
+            type: 'bar',
+            order: null,
+            groups: [labels],
+            x: 'x',
+            columns: data
+        },
+        tooltip: {
+            format: {
+                value: d3.format('.2f')
+            }
+        }
+    });
+}
+var make_pie = function (id, datalist) {
+    make_bar_1(id, datalist, colorlist[datalist.length-1])
+}
+var make_pie_categorical = function(id, datalist) {
+    make_bar_1(id, datalist, colorlist_categorical)
+}
+var importance_inv = {
+    "Extremely Useful": 0,
+    "Useful": 1,
+    "Somewhat Useful": 2,
+    "Not Useful": 3
+}
+// very specialized function for a particular set of charts
+var make_tools_bar = function(id, datalist, showlegend) {
+    // data is three rows for "all", "dev", and "non-dev"
+    var newdata = [['x', 'Extremely Useful', 'Useful', 'Somewhat Useful', 'Not Useful']]
+    for(i = 0; i < datalist.length; i++){
+        var total = datalist[i].reduce(
+            (a,v) => a + (typeof v == "number" ? v : 0),
+            0)
+        newdata.push(datalist[i].map(
+            v => typeof v == "string" ? v : ((v/total)*100).toFixed(1)
+        ))
+    }
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        size: { height: 125 },
+        axis: {
+            x: { type: 'category' },
+            y: { max: 100, padding: 0, label: 'Percent' },
+            rotated: true
+        },
+        legend: {hide: !showlegend},
+        bar: { width: { ratio: 0.9 }},
+        data: {
+            type: 'bar',
+            order: null,
+            color: function (color, d) {
+                var p = colorlist;
+                if (d.x > 0) { p = colorlist_light }
+                var v = importance_inv[d.id || d]
+                return p[3][v]
+            },
+            colors: colorlist[3],
+            x: 'x',
+            groups: [['Extremely Useful', 'Useful', 'Somewhat Useful', 'Not Useful']],
+            rows: newdata
+        }});
 }
 </script>
 
@@ -93,10 +213,10 @@ ease your path to publishing, sharing, curating, or reusing data or software:
             type: 'bar',
             order: null,
             colors: {
-                'Extremely useful': colorlist[0],
-                'Useful': colorlist[1],
-                'Somewhat useful': colorlist[2],
-                'Not useful': colorlist[3]
+                'Extremely useful': colorlist[3][0],
+                'Useful': colorlist[3][1],
+                'Somewhat useful': colorlist[3][2],
+                'Not useful': colorlist[3][3]
             },
             x: 'x',
             groups: [['Extremely useful', 'Useful', 'Somewhat useful',  'Not useful']],
@@ -112,7 +232,85 @@ ease your path to publishing, sharing, curating, or reusing data or software:
            ]}});
     </script>
 
-        <h3>Do you have a data or software preservation quality tool need this project could help you develop ? If so, please describe:
+    <script>
+        function toggletooldetail() {
+            var x = document.getElementsByClassName("toolusedetail")[0]
+            x.classList.toggle('is-visible')
+        }
+    </script>
+
+        <button onclick="toggletooldetail()">Show More Detail</button>
+
+        <div class="toolusedetail">
+        <div class="tool">
+            <p class="toolmatrixname">Provenance</p>
+            <div id="tools_use_matrix_provenance"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Workflow</p>
+            <div id="tools_use_matrix_workflow"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Fixity</p>
+            <div id="tools_use_matrix_fixity"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Assignment</p>
+            <div id="tools_use_matrix_assignment"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Profile Based Recommender</p>
+            <div id="tools_use_matrix_profile"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">De-identification</p>
+            <div id="tools_use_matrix_deidentification"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Quality</p>
+            <div id="tools_use_matrix_quality"></div>
+        </div>
+        </div>
+
+<script>
+    make_tools_bar("tools_use_matrix_provenance", [
+        ['All', 554, 554, 276, 86],
+        ['Developers', 223, 177, 69, 14],
+        ['Non-Developers', 331, 377, 207, 72]
+    ])
+    make_tools_bar("tools_use_matrix_workflow", [
+        ['All', 516, 533, 301, 117],
+        ['Developers', 199, 169, 92, 23],
+        ['Non-Developers', 317, 364, 209, 94]
+    ])
+    make_tools_bar("tools_use_matrix_fixity", [
+        ['All', 341, 580, 384, 148],
+        ['Developers', 135, 195, 116, 33],
+        ['Non-Developers', 206, 385, 268, 115]
+    ])
+    make_tools_bar("tools_use_matrix_assignment", [
+        ['All', 275, 522, 451, 209],
+        ['Developers', 91, 183, 148, 60],
+        ['Non-Developers', 184, 339, 303, 149]
+    ])
+    make_tools_bar("tools_use_matrix_profile", [
+        ['All', 156, 469, 541, 292],
+        ['Developers', 49, 160, 183, 90],
+        ['Non-Developers', 107, 309, 358, 202]
+    ])
+    make_tools_bar("tools_use_matrix_deidentification", [
+        ['All', 325, 390, 380, 368],
+        ['Developers', 111, 126, 154, 112],
+        ['Non-Developers', 214, 264, 246, 256]
+    ])
+    make_tools_bar("tools_use_matrix_quality", [
+        ['All', 338, 559, 381, 184],
+        ['Developers', 129, 191, 119, 45],
+        ['Non-Developers', 209, 368, 262, 239]
+    ], true)
+</script>
+
+        <h3>Do you have a data or software preservation quality tool need this project could help you develop? If so, please describe:
         <small class="text-muted">(tools_data_preserv)</small>
         </h3>
 
@@ -731,10 +929,11 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         <hr>
         <h1>Researcher Behavior</h1>
 
+        <div class="pair">
         <h3>How familiar are you with tools used to share, publish, cite and preserve data or software?
         <small class="text-muted">(res)</small>
         </h3>
-        <div id="res"></div>
+        <div id="res" class="pie"></div>
     <script>
         make_pie('res',[
                 ['Extremely familiar', 56], // green
@@ -745,11 +944,12 @@ ease your path to publishing, sharing, curating, or reusing data or software:
                 //['no answer', 426],
                 ]);
     </script>
+        </div>
 
     <h3>Do you anticipate publishing or sharing your own data or code over the next five years?
     <small class="text-muted">(res_pubshare_5)</small>
     </h3>
-            <div id="res_pubshare_5"></div>
+            <div id="res_pubshare_5" class="pie"></div>
     <script>
         make_pie('res_pubshare_5',[
 ['Definitely will', 761],
@@ -764,7 +964,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
     <h3>In the past, how often have you made your research data free to access, reuse, repurpose, and redistribute?
     <small class="text-muted">(res_open_data)</small>
     </h3>
-    <div id="res_open_data"></div>
+    <div id="res_open_data" class="pie"></div>
     <script>
         make_pie('res_open_data',[
 ['Always', 226],
@@ -779,7 +979,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
     <h3>Is any of your data or code published or shared now on a repository or website?
     <small class="text-muted">(res_pubshare)</small>
     </h3>
-    <div id="res_pubshare"></div>
+    <div id="res_pubshare" class="pie"></div>
     <script>
         make_pie('res_pubshare',[
 ['All that can be', 253],
@@ -799,13 +999,15 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         var res_open_data3 = c3.generate({
             bindto: "#res_open_data3",
             axis: {
-                x: { type: 'category'}
+                x: { type: 'category'},
+                y: { label: 'Count'}
             },
+            legend: { show: false },
             data: {
                 type: 'bar',
                 order: null,
-               colors: {
-                    count: colorlist[0]
+                colors: {
+                    count: colorlist[0][0]
                 },
                 x: 'x',
                 columns:[
@@ -822,17 +1024,18 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         var res_tools_share = c3.generate({
             bindto: "#res_tools_share",
             axis: {
-                x: { type: 'category'}
+                x: { type: 'category'},
+                y: { label: 'Count'}
             },
             data: {
                 type: 'bar',
                 order: null,
                 colors: {
-                    'to share': colorlist[0],
-                    'to re-use': colorlist[1],
-                    'to cite': colorlist[2],
-                    'to publish': colorlist[3],
-                    'to preserve': colorlist[4]
+                    'to share': colorlist_categorical[0],
+                    'to re-use': colorlist_categorical[1],
+                    'to cite': colorlist_categorical[2],
+                    'to publish': colorlist_categorical[3],
+                    'to preserve': colorlist_categorical[4]
                 },
                 x: 'x',
                 columns: [
@@ -848,7 +1051,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
     <h3>When asked to submit keywords to describe your own or others' research is it usually:
     <small class="text-muted">(res_keywords)</small>
     </h3>
-    <div id="res_keywords"></div>
+    <div id="res_keywords" class="pie"></div>
 
     <script>
         make_pie('res_keywords',[
@@ -864,7 +1067,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
     <h3>When asked to submit keywords to describe your own or others' resarch how accurately do the terms available usually describe your work?
     <small class="text-muted">(res_keywords_avail)</small>
     </h3>
-    <div id="res_keywords_avail"></div>
+    <div id="res_keywords_avail" class="pie"></div>
 
     <script>
         make_pie('res_keywords_avail',[
@@ -881,7 +1084,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         openly available?
     <small class="text-muted">(res_employ_open)</small>
     </h3>
-    <div id="res_employ_open"></div>
+    <div id="res_employ_open" class="pie"></div>
 
     <script>
         make_pie('res_employ_open',[
@@ -896,7 +1099,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         publications or data openly available?
     <small class="text-muted">(res_fund_open)</small>
     </h3>
-    <div id="res_fund_open"></div>
+    <div id="res_fund_open" class="pie"></div>
 
     <script>
         make_pie('res_fund_open',[
@@ -1134,13 +1337,15 @@ access to your research data?
         var res_pub_infrastruct = c3.generate({
             bindto: "#res_pub_infrastruct",
             axis: {
-                x: { type: 'category'}
+                x: { type: 'category'},
+                y: { label: 'Count'}
             },
+            legend: { show: false},
             data: {
                 type: 'bar',
                 order: null,
                 colors: {
-                    Count: colorlist[0]
+                    Count: colorlist[0][0]
                 },
                 x: 'x',
                 rows: [
@@ -1157,7 +1362,7 @@ access to your research data?
         documenting provenance of your own or others' data or code easier?
     <small class="text-muted">(res_metadata)</small>
     </h3>
-    <div id="res_metadata"></div>
+    <div id="res_metadata" class="pie"></div>
 
     <script>
         make_pie("res_metadata", [
@@ -1182,16 +1387,17 @@ following specialized resources?
             bindto: "#res_tools",
             axis: {
                 rotated: true,
-                x: { type: 'category'}
+                x: { type: 'category'},
+                y: { label: 'Count'}
             },
             data: {
                 type: 'bar',
                 order: null,
                 colors: {
-                    'Extremely important': colorlist[0],
-                    'Important': colorlist[1],
-                    'Unimportant': colorlist[2],
-                    'Not at all Important': colorlist[3]
+                    'Extremely important': colorlist[3][0],
+                    'Important': colorlist[3][1],
+                    'Unimportant': colorlist[3][2],
+                    'Not at all Important': colorlist[3][3]
                 },
                 x: 'x',
                 groups: [['Extremely important', 'Important', 'Unimportant',  'Not at all Important']],
@@ -1216,7 +1422,7 @@ following specialized resources?
     <h3>Do you create and/or use software, code, or scripts in your research?
     <small class="text-muted">(res_code)</small>
     </h3>
-    <div id="res_code"></div>
+    <div id="res_code" class="pie"></div>
 
     <script>make_pie('res_code', [
 ['Always', 547],
@@ -1232,7 +1438,7 @@ following specialized resources?
         data?
     <small class="text-muted">(res_author_sw)</small>
     </h3>
-    <div id="res_author_sw"></div>
+    <div id="res_author_sw" class="pie"></div>
 
     <script>make_pie('res_author_sw', [
 ['Yes', 905],
@@ -1247,7 +1453,7 @@ following specialized resources?
         to analyze or produce your data?
     <small class="text-muted">(res_hire_swdev)</small>
     </h3>
-    <div id="res_hire_swdev"></div>
+    <div id="res_hire_swdev" class="pie"></div>
 
     <script>make_pie('res_hire_swdev', [
 ['Yes', 860],
@@ -1261,7 +1467,7 @@ following specialized resources?
     <h3>For others to reproduce your results would they need your software, code or scripts?
     <small class="text-muted">(res_reproduce)</small>
     </h3>
-    <div id="res_reproduce"></div>
+    <div id="res_reproduce" class="pie"></div>
 
     <script>make_pie('res_reproduce', [
 ['Always', 155],
@@ -1278,7 +1484,7 @@ analyze or produce your data more often than writing new code or hiring someone 
 custom software to analyze or produce data for your project(s)?
     <small class="text-muted">(res_external_sw)</small>
     </h3>
-    <div id="res_external_sw"></div>
+    <div id="res_external_sw" class="pie"></div>
 
     <script>make_pie('res_external_sw', [
 ['Always', 95],
@@ -1775,7 +1981,7 @@ systems used to share, publish or preserve data or software. Are these sorts of 
 responsibility?
     <small class="text-muted">(dev)</small>
         </h3>
-        <div id="dev"></div>
+        <div id="dev" class="pie"></div>
 
     <script>make_pie('dev', [
 ['Yes', 213],
@@ -1790,9 +1996,9 @@ responsibility?
     <small class="text-muted">(dev_code_verCon)</small>
     </h3>
 
-    <div id="dev_code_verCon"></div>
+    <div id="dev_code_verCon" class="pie"></div>
 
-    <script>make_pie('dev_code_verCon', [
+    <script>make_pie_categorical('dev_code_verCon', [
 ['Yes, collaboratively develop and publicly share in a code repository', 112],
 ['Yes, manage in a code repository but don\'t make public', 47],
 ['No, it\'s all managed at the team or dev level internally on developer machines or our local filesystems', 73],
@@ -1811,17 +2017,18 @@ responsibility?
         var dev_sw_dams = c3.generate({
             bindto: "#dev_sw_dams",
             axis: {
-                x: { type: 'category'}
+                x: { type: 'category'},
+                y: { label: "Count" }
             },
             data: {
                 type: 'bar',
                 order: null,
                 x: 'x',
                 colors: {
-                    Develop: colorlist[0],
-                    Administer: colorlist[1],
-                    Maintain: colorlist[2],
-                    Support: colorlist[3]
+                    Develop: colorlist_categorical[0],
+                    Administer: colorlist_categorical[1],
+                    Maintain: colorlist_categorical[2],
+                    Support: colorlist_categorical[3]
                 },
                 rows:[
                     ['x', 'Develop', 'Administer', 'Maintain', 'Support'],
@@ -1837,9 +2044,9 @@ develop, administer,
 maintain or support ?
     <small class="text-muted">(dev_sw_eol)</small>
     </h3>
-    <div id="dev_sw_eol"></div>
+    <div id="dev_sw_eol" class="pie"></div>
 
-    <script>make_pie('dev_sw_eol', [
+    <script>make_pie_categorical('dev_sw_eol', [
 ['>10 years', 48],
 ['10 years', 15],
 ['5-10 years', 104],
@@ -1853,9 +2060,9 @@ develop, administer, maintain or support, how
 many users are there:
     <small class="text-muted">(dev_user_count)</small>
     </h3>
-    <div id="dev_user_count"></div>
+    <div id="dev_user_count" class="pie"></div>
 
-    <script>make_pie('dev_user_count', [
+    <script>make_pie_categorical('dev_user_count', [
 ['over 50,000 users', 3],
 ['over 10,000 users', 6],
 ['over 1000 users', 13],
@@ -1875,12 +2082,14 @@ many users are there:
         var dev_license = c3.generate({
             bindto: "#dev_license",
             axis: {
-                x: { type: 'category'}
+                x: { type: 'category'},
+                y: { label: 'Count'}
             },
+            legend: { show: false },
             data: {
                 type: 'bar',
                 colors: {
-                    Count: colorlist[0]
+                    Count: colorlist[0][0]
                 },
                 order: null,
                 x: 'x',
@@ -1905,7 +2114,7 @@ many users are there:
 <h3>Have you containerized any code to make sharing or distribution easier?
     <small class="text-muted">(dev_code_container)</small>
 </h3>
-<div id="dev_code_container"></div>
+<div id="dev_code_container" class="pie"></div>
 
     <script>make_pie('dev_code_container', [['Yes', 33], ['No', 92]]);
     </script>
