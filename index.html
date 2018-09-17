@@ -67,12 +67,12 @@ var charts = {}
 
 // array of # of items by list of colors to use
 var colorlist = [
-    ["#1f78b4"],
-    ['#1f78b4','#d84d23'],
-    ['#1f78b4','#e3ddcd','#d84d23'],
-    ['#1f78b4','#90abc2','#e8b093','#d84d23'],
-    ['#1f78b4','#7a9dbf','#e3ddcd','#e79877','#d84d23'],
-    ['#1f78b4','#6d96bd','#a0b6c5','#e8c2a9','#e58a66','#d84d23']
+    ["#2a656c"],
+    ["#2a656c", "#d84d23"],
+    ["#2a656c", "#e3ddcd", "#d84d23"],
+    ["#2a656c", "#3c9ab4", "#f19043", "#d84d23"],
+    ["#2a656c", "#3c9ab4", "#e3ddcd", "#f19043", "#d84d23"],
+    ["#2a656c", "#3c9ab4", "#b8c6c9", "#e3ddcd", "#f19043", "#d84d23"]
 ]
 
 var colorlist_light = [
@@ -80,13 +80,13 @@ var colorlist_light = [
     ["#7fbee9", "#eca58f"],
     ["#7fbee9", "#f1eee6", "#eca58f"],
     ["#7fbee9", "#c7d4e0", "#f3d7c9", "#eca58f"],
-    ['#7fbee9','#bccedf','#f1eee6','#f3cbbb','#eca58f'],
+    ["#7fbee9", "#bccedf", "#f1eee6", "#f3cbbb", "#eca58f"],
     ["#7fbee9", "#b6cade", "#cfdae2", "#f3e0d3", "#f1c4b2", "#eca58f"]
 ]
 
+var colorlist_categorical = ["#2a656c", "#9dc62d", "#f8ac29", "#848f94", "#8560a8", "#cfdae2"]
 
-
-var colorlist_categorical = ["#a65628", "#ff7f00", "#984ea3", "#f781bf", "#4daf4a", "#ffff33"]
+var colorlist_sequential = ["#08519c", "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#eff3ff"]
 
 var make_pie_1 = function(id, datalist, colors) {
     charts[id] = c3.generate({
@@ -145,6 +145,9 @@ var make_pie = function (id, datalist) {
 }
 var make_pie_categorical = function(id, datalist) {
     make_bar_1(id, datalist, colorlist_categorical)
+}
+var make_pie_sequential = function(id, datalist) {
+    make_bar_1(id, datalist, colorlist_sequential)
 }
 var importance_inv = {
     "Extremely Useful": 0,
@@ -1035,7 +1038,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
                     'to re-use': colorlist_categorical[1],
                     'to cite': colorlist_categorical[2],
                     'to publish': colorlist_categorical[3],
-                    'to preserve': colorlist_categorical[4]
+                    'to preserve': colorlist_categorical[5]
                 },
                 x: 'x',
                 columns: [
@@ -2025,10 +2028,10 @@ responsibility?
                 order: null,
                 x: 'x',
                 colors: {
-                    Develop: colorlist_categorical[0],
-                    Administer: colorlist_categorical[1],
-                    Maintain: colorlist_categorical[2],
-                    Support: colorlist_categorical[3]
+                    Develop: colorlist_categorical[3],
+                    Administer: colorlist_categorical[2],
+                    Maintain: colorlist_categorical[1],
+                    Support: colorlist_categorical[0]
                 },
                 rows:[
                     ['x', 'Develop', 'Administer', 'Maintain', 'Support'],
@@ -2046,7 +2049,7 @@ maintain or support ?
     </h3>
     <div id="dev_sw_eol" class="pie"></div>
 
-    <script>make_pie_categorical('dev_sw_eol', [
+    <script>make_pie_sequential('dev_sw_eol', [
 ['>10 years', 48],
 ['10 years', 15],
 ['5-10 years', 104],
@@ -2062,7 +2065,7 @@ many users are there:
     </h3>
     <div id="dev_user_count" class="pie"></div>
 
-    <script>make_pie_categorical('dev_user_count', [
+    <script>make_pie_sequential('dev_user_count', [
 ['over 50,000 users', 3],
 ['over 10,000 users', 6],
 ['over 1000 users', 13],
