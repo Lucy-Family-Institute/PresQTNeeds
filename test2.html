@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>PresQT Needs Assessment Results</title>
+
+    <!-- Include Bootstrap styles-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+<!-- Load c3.css -->
+<link href="c3.css" rel="stylesheet">
+<style>
+.scroll {
+    height: 300px;
+    overflow-y: scroll;
+}
+.pie {
+    min-height: 150px;
+}
+.toolusedetail {
+    display: none;
+    flex-direction: column;
+}
+.toolusedetail.is-visible {
+    display: flex;
+}
+.toolmatrixname {
+    font-weight: bold;
+}
+</style>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-113800656-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-113800656-1');
+</script>
+
+    </head>
+    <body>
+        <div class="container">
+       <h1>PresQT Needs Assessment Results</h1>
+            <p>In the Summer/Fall of 2017 Participants were invited to contribute answers for the PresQT research study, 
+            entitled "Data and Software Preservation Quality Tool Needs Assessment" related to the
+            <a href = "https://osf.io/d3jx7/">PresQT Project</a>, University of Notre Dame Study 
+            # 17-04-3850 DOI 10.17605/OSF.IO/D3JX7. Data Collection 
+            closed Sept 1, 2017 at 5 PM EDT. Participants' answers to a series of questions related
+            to their past practice, and anticipated future needs as researchers and/or software developers
+            contribute to a better understanding of what tools and/or tool suites would be of benefit those preserving and/or sharing data and software. </p>
+
+            
+            <p>The Needs Assessment questionnaire and response data are available on the <a href="https://osf.io/xfws6/">project page</a>.</p>
+        <ul>
+            <li><a href="https://osf.io/xzhau/">Questionnaire</a> (PDF)</li>
+            <li><a href="https://osf.io/6v325/">Data</a></li>
+        </ul>
+<!-- Load d3.js and c3.js -->
+<script src="d3.v3.min.js"></script>
+<script src="c3.min.js"></script>
+<script>
+var charts = {}
+
+// array of # of items by list of colors to use
+var colorlist = [
+    ["#2a656c"],
+    ["#2a656c", "#d84d23"],
+    ["#2a656c", "#e3ddcd", "#d84d23"],
+    ["#2a656c", "#3c9ab4", "#f19043", "#d84d23"],
+    ["#2a656c", "#3c9ab4", "#e3ddcd", "#f19043", "#d84d23"],
+    ["#2a656c", "#3c9ab4", "#b8c6c9", "#e3ddcd", "#f19043", "#d84d23"]
+]
+
+var colorlist_light = [
+    ["#7fbee9"],
+    ["#7fbee9", "#eca58f"],
+    ["#7fbee9", "#f1eee6", "#eca58f"],
+    ["#7fbee9", "#c7d4e0", "#f3d7c9", "#eca58f"],
+    ["#7fbee9", "#bccedf", "#f1eee6", "#f3cbbb", "#eca58f"],
+    ["#7fbee9", "#b6cade", "#cfdae2", "#f3e0d3", "#f1c4b2", "#eca58f"]
+]
+
+
+
+var colorlist_categorical = ["#2a656c", "#9dc62d", "#f8ac29", "#848f94", "#8560a8", "#cfdae2"]
+
+ <!-- Add Sequential Color variable-->
+var colorlist_sequential = ["#08519c", "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#eff3ff"]
+
+var make_pie_1 = function(id, datalist, colors) {
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        data: {
+            type: 'pie',
+            order: null,
+            columns: datalist
+        },
+        color: {
+            pattern: colors
+        }
+    })
+}
+var make_bar_1 = function(id, datalist, colors) {
+    var data = [['x',' ']].concat(datalist)
+    var labels = []
+    var total = 0
+    for(i = 0; i < datalist.length; i++){
+        labels.push(datalist[i][0])
+        total += datalist[i][1]
+    }
+    for(i = 0; i < datalist.length; i++){
+        datalist[i][1] = ((datalist[i][1] / total)*100).toFixed(1)
+    }
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        axis: {
+            x: { type: 'category' },
+            y: { max: 100, padding: 0, label: "Percent (n=" + total + ")" },
+            rotated: true
+        },
+        color: {
+            pattern: colors
+        },
+        bar : {
+            width: { ratio: 0.6 }
+        },
+        x: 'x',
+        data: {
+            type: 'bar',
+            order: null,
+            groups: [labels],
+            x: 'x',
+            columns: data
+        },
+        tooltip: {
+            format: {
+                value: d3.format('.2f')
+            }
+        }
+    });
+}
+var make_pie = function (id, datalist) {
+    make_bar_1(id, datalist, colorlist[datalist.length-1])
+}
+var make_pie_categorical = function(id, datalist) {
+    make_bar_1(id, datalist, colorlist_categorical)
+}
+var make_pie_sequential = function(id, datalist) {
+    make_bar_1(id, datalist, colorlist_sequential)
+}
+var importance_inv = {
+    "Extremely Useful": 0,
+    "Useful": 1,
+    "Somewhat Useful": 2,
+    "Not Useful": 3
+}
+// very specialized function for a particular set of charts
+var make_tools_bar = function(id, datalist, showlegend) {
+    // data is three rows for "all", "dev", and "non-dev"
+    var newdata = [['x', 'Extremely Useful', 'Useful', 'Somewhat Useful', 'Not Useful']]
+    for(i = 0; i < datalist.length; i++){
+        var total = datalist[i].reduce(
+            (a,v) => a + (typeof v == "number" ? v : 0),
+            0)
+        newdata.push(datalist[i].map(
+            v => typeof v == "string" ? v : ((v/total)*100).toFixed(1)
+        ))
+    }
+    charts[id] = c3.generate({
+        bindto: "#" + id,
+        size: { height: 125 },
+        axis: {
+            x: { type: 'category' },
+            y: { max: 100, padding: 0, label: 'Percent' },
+            rotated: true
+        },
+        legend: {hide: !showlegend},
+        bar: { width: { ratio: 0.9 }},
+        data: {
+            type: 'bar',
+            order: null,
+            color: function (color, d) {
+                var p = colorlist;
+                if (d.x > 0) { p = colorlist_light }
+                var v = importance_inv[d.id || d]
+                return p[3][v]
+            },
+            colors: colorlist[3],
+            x: 'x',
+            groups: [['Extremely Useful', 'Useful', 'Somewhat Useful', 'Not Useful']],
+            rows: newdata
+        }});
+}
+</script>
+
+        <hr>
+
+        <h1>Tools/Usefulness/Sort</h1>
+
+        <h3>Indicate whether implementation or integration of tools like those below would 
+ease your path to publishing, sharing, curating, or reusing data or software:
+        <small class="text-muted">(tools_use_matrix)</small>
+        </h3>
+
+        <div id="tools_use_matrix"></div>
+
+    <script>
+    var tools_use_matrix = c3.generate({
+        bindto: "#tools_use_matrix",
+        axis: {
+            x: { type: 'category'},
+            rotated: true
+        },
+        data: {
+            type: 'bar',
+            order: null,
+            colors: {
+                'Extremely useful': colorlist[3][0],
+                'Useful': colorlist[3][1],
+                'Somewhat useful': colorlist[3][2],
+                'Not useful': colorlist[3][3]
+            },
+            x: 'x',
+            groups: [['Extremely useful', 'Useful', 'Somewhat useful',  'Not useful']],
+            rows:[
+                ['x', 'Extremely useful', 'Useful', 'Somewhat useful',  'Not useful'],
+                ['Provenance', 554, 554, 276, 86],
+                ['Workflow', 516, 533, 301, 117],
+                ['Fixity', 341, 580, 384, 148],
+                ['Assignment', 275, 522, 451, 209],
+                ['Profile Based Recommender', 156, 469, 541, 292],
+                ['De-identification', 325, 390, 380, 368],
+                ['Quality', 338, 559, 381, 184]
+           ]}});
+    </script>
+
+    <script>
+        function toggletooldetail() {
+            var x = document.getElementsByClassName("toolusedetail")[0]
+            x.classList.toggle('is-visible')
+        }
+    </script>
+
+        <button onclick="toggletooldetail()">Show More Detail</button>
+
+        <div class="toolusedetail">
+        <div class="tool">
+            <p class="toolmatrixname">Provenance</p>
+            <div id="tools_use_matrix_provenance"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Workflow</p>
+            <div id="tools_use_matrix_workflow"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Fixity</p>
+            <div id="tools_use_matrix_fixity"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Assignment</p>
+            <div id="tools_use_matrix_assignment"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Profile Based Recommender</p>
+            <div id="tools_use_matrix_profile"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">De-identification</p>
+            <div id="tools_use_matrix_deidentification"></div>
+        </div>
+        <div class="tool">
+            <p class="toolmatrixname">Quality</p>
+            <div id="tools_use_matrix_quality"></div>
+        </div>
+        </div>
+
+<script>
+    make_tools_bar("tools_use_matrix_provenance", [
+        ['All', 554, 554, 276, 86],
+        ['Developers', 223, 177, 69, 14],
+        ['Non-Developers', 331, 377, 207, 72]
+    ])
+    make_tools_bar("tools_use_matrix_workflow", [
+        ['All', 516, 533, 301, 117],
+        ['Developers', 199, 169, 92, 23],
+        ['Non-Developers', 317, 364, 209, 94]
+    ])
+    make_tools_bar("tools_use_matrix_fixity", [
+        ['All', 341, 580, 384, 148],
+        ['Developers', 135, 195, 116, 33],
+        ['Non-Developers', 206, 385, 268, 115]
+    ])
+    make_tools_bar("tools_use_matrix_assignment", [
+        ['All', 275, 522, 451, 209],
+        ['Developers', 91, 183, 148, 60],
+        ['Non-Developers', 184, 339, 303, 149]
+    ])
+    make_tools_bar("tools_use_matrix_profile", [
+        ['All', 156, 469, 541, 292],
+        ['Developers', 49, 160, 183, 90],
+        ['Non-Developers', 107, 309, 358, 202]
+    ])
+    make_tools_bar("tools_use_matrix_deidentification", [
+        ['All', 325, 390, 380, 368],
+        ['Developers', 111, 126, 154, 112],
+        ['Non-Developers', 214, 264, 246, 256]
+    ])
+    make_tools_bar("tools_use_matrix_quality", [
+        ['All', 338, 559, 381, 184],
+        ['Developers', 129, 191, 119, 45],
+        ['Non-Developers', 209, 368, 262, 239]
+    ], true)
+</script>
+
+        <h3>Do you have a data or software preservation quality tool need this project could help you develop? If so, please describe:
+        <small class="text-muted">(tools_data_preserv)</small>
+        </h3>
+
+        <p>Sample of responses:</p>
+        <ul class="list-group scroll">
+
+            <li class="list-group-item">4CeeD cloud-based system that collects data and metadata from microscopes, and then allows scientists to curate the data on the cloud.</li>
+            <li class="list-group-item">A 'map of the data preservation' landscape showing canonical repositories, types of data it stores, metadata requirements, costs, etc.</li>
+            <li class="list-group-item">A Thermodynamic model</li>
+            <li class="list-group-item">A clear way to save large MD trajectory files that is cost-effective</li>
+            <li class="list-group-item">A major challenge in my main field, which is molecular dynamics simulation, is the question of how to share and curate simulation trajectory files. These files are the base output of every molecular dynamics run - they are the equivalent of providing a sample of a material itself in experiment. The central challenge is that these files are very large (we have ca. 100 TB of trajectory files from our group alone). It is also extremely difficult to track their provenance and the precise metadata associated with the conditions under which they were generated. Nevertheless, a facile ability to share these files among the community could exponentially amplify the communities productivity by permitting renanalysis of existing trajectories, rather than a constant need to redo work someone else has done. There is presently no good solution.</li>
+            <li class="list-group-item">A place put large ([greater than] 1 TB) datasets (and associated metadata) for preservation at no cost to the data producer and that will remain publicly accessible. Preferably, this service would have an API so that datasets could be easily integrated into other services.</li>
+            <li class="list-group-item">A suite of R packages for reproducibility</li>
+            <li class="list-group-item">A tool that can assess what needs to be preserved / documented to maintain long-term access to data and software</li>
+            <li class="list-group-item">A tool that would ensure that a proper lab-book/log entry was provided for each data recording session. A generalized and very fast/easy tool for checking in data analysis lab book entries. It's fine to have analysis code, but without a lab book and demo/docs its nearly impossible to run or understand the code.</li>
+            <li class="list-group-item">A version system that is good with videos or specific files with software such as Unity3D or Autodesk Maya</li>
+            <li class="list-group-item">A way of identifying the right repository for my data.</li>
+            <li class="list-group-item">All of my projects work with speech and natural language data, therefore I have extensive experience creating and deploying software solving all fo the problems mentioned on previous page</li>
+            <li class="list-group-item">All of the things on the previous page would be useful</li>
+            <li class="list-group-item">Already have sufficient tools for this.</li>
+            <li class="list-group-item">Anonymization of data; version control;tools to ensure integrity of data files</li>
+            <li class="list-group-item">Any tools for developing and sharing ontologies in OWL.</li>
+            <li class="list-group-item">Anything that helps tracking who, when or what data were added or changed. Overall tracking of projects and project-based metadata standards  are needed. One huge problem in data preservation is lack of translation services that allow data in obsolete software or stored on obsolete hardware to re recovered more easily.</li>
+            <li class="list-group-item">As part of a user facility:  we are developing data & software preservation protocols right now, so suggestions of current best practices and canned tools could be very helpful</li>
+            <li class="list-group-item">Assigning DOIs to datasets. Finding relationships among disparate datasets and mapping concepts across them</li>
+            <li class="list-group-item">Basic spectral data format</li>
+            <li class="list-group-item">Better integration of version control software and ids that describe what revision of a software was used for publications</li>
+            <li class="list-group-item">Collecting data from social media</li>
+            <li class="list-group-item">Comparison of hosted platforms</li>
+            <li class="list-group-item">Computational and experimental data. Software.</li>
+            <li class="list-group-item">Could use a tool that can apply anonymized identifiers across multiple data files.</li>
+            <li class="list-group-item">Curate instances of code used in published papers where that code has now been developed further.</li>
+            <li class="list-group-item">Currently using Samvera, which does not make it easy to export metadata to create an offsite archival copy. Currently my biggest need for our repository!</li>
+            <li class="list-group-item">Currently using available tools to track and preserve software and data.</li>
+            <li class="list-group-item">Currently we archive our data with the LTER Network Information System (NIS) Data Portal. However, as we move forward with new projects we will have other csv files that needs to be archived/preserved.  Right now we are planning to use curateND for those files.</li>
+            <li class="list-group-item">Custom student data for educational research in STEM</li>
+            <li class="list-group-item">Customers of an institute I run may have this need.</li>
+            <li class="list-group-item">Data Mining on Big Data for Automated User Profiling</li>
+            <li class="list-group-item">Data collected from children's learning app, so privacy/anonymization of students' identities is crucial.  This data is currently stored in set of SQL tables.</li>
+            <li class="list-group-item">Data from engineering education study</li>
+            <li class="list-group-item">Data from insurance claims that need to be made anonymous</li>
+            <li class="list-group-item">Data from robotic telescope</li>
+            <li class="list-group-item">Data need. Test and analysis data and softwares used to generate the analytical data.</li>
+            <li class="list-group-item">Data tool for archiving evaluation plans for citation [see] the recent AERA-NSF workshop on data sharing and transparency.</li>
+            <li class="list-group-item">Database of observational data</li>
+            <li class="list-group-item">Databases of mathematical classifications (similar to crystolography tables) that need timeless and language independent modelling.</li>
+            <li class="list-group-item">De-anonymization</li>
+            <li class="list-group-item">De-identification of qualitative data (e.g., video or screencapture). Project level organization of data.</li>
+            <li class="list-group-item">Different types of phylogenomic data (sequences, SNPs) and data processing and analysis pipelines.</li>
+            <li class="list-group-item">Don't know - not sure what "this project" is and what resources are available to researchers outside of Notre Dame.</li>
+            <li class="list-group-item">Don't think so</li>
+            <li class="list-group-item">Drupal or Wordpress plug-ins for data quality/management tasks.</li>
+            <li class="list-group-item">Easy metadata entry and retrieval</li>
+            <li class="list-group-item">Easy to use database to identify projects, users, etc. associated with large batches of raw data.</li>
+            <li class="list-group-item">FLexible system for creating meta data when uploading unstructured datasets</li>
+            <li class="list-group-item">GitHub</li>
+            <li class="list-group-item">How to make ethnographic interviews anonymous in multiple languages.</li>
+            <li class="list-group-item">How to preserve linux command pipelines from bioinformatic analyses?</li>
+            <li class="list-group-item">I am developing a search engine where the search index should be shared but it is too big to be simply uploaded.</li>
+            <li class="list-group-item">I am involved in developing preservation of workflows in computational modeling</li>
+            <li class="list-group-item">I am not sure but we are developing a software in Matlab as a part of the project</li>
+            <li class="list-group-item">I am not sure what "this project" does, so that's hard to answer. In general, though, I think it is more a 'community' level issue, rather than an individual researcher need.</li>
+            <li class="list-group-item">I am not sure. I am working on a global millipede species database, MilliBase.org. Currently, I think we are doing ok.</li>
+            <li class="list-group-item">I collect experimental data and would like to do a better job of archiving it.</li>
+            <li class="list-group-item">I do but I am not sure a general purpose tool could help.</li>
+            <li class="list-group-item">I generate lots of data...</li>
+            <li class="list-group-item">I have A LOT of different kinds of data (video, written, digital artifacts, etc.) - it would be really useful if there were some sort of tool that allowed me to organize all of that data so that it could be easier to analyze it.</li>
+            <li class="list-group-item">I have a large amount of coal geochemical and petrographic data gathered over the past 39 years.</li>
+            <li class="list-group-item">I have a project archiving information on survey data quality. contact me another way to discuss this</li>
+            <li class="list-group-item">I have a stellar population synthesis code that is managed on bitbucket, but could probably be better managed. This is particularly true because part of the software makes use or large training sets that are themselves too large to be managed on bitbucket. At present they are just stored on our group's website without any real version control.</li>
+            <li class="list-group-item">I have been developing modeling software for 10+years focused on a single project, and it has gone through many revisions and extensions.</li>
+            <li class="list-group-item">I have data [and] software to preserve, but am wary of another source or group that wants to deal with this other than myself</li>
+            <li class="list-group-item">I have data from electronic structure calculations (VASP) from which pieces are extracted and then stored and analyzed in Excel spreadsheets. Very inconvenient for long term storage.</li>
+            <li class="list-group-item">I have many types of data from -omics to ecosystem fluxes to imagery.</li>
+            <li class="list-group-item">I know of several tools that do parts of the process, but having a tool that navigates the expositions tools would be great (and meta!). It would also be easier for me to find the gaps and answer this question, since different projects require different tools.</li>
+            <li class="list-group-item">I mainly need something that makes it easy to archive large numbers of large files (the lab can easily generate more than 1 GB of data per day if we wanted to) and ideally also makes it easy to tag them with various metadata.</li>
+            <li class="list-group-item">I only do qualitative research and use NVivo or HyperResearch to manage my text based data</li>
+            <li class="list-group-item">I produce artifacts for almost every one of my papers, so I have dozens??_</li>
+            <li class="list-group-item">I recommend that imaging data be stored as fits fiiles</li>
+            <li class="list-group-item">I run the Paleobiology Database, and we would like to create archivable snapshots of the database for reference.</li>
+            <li class="list-group-item">I struggle with how to combine usage of GitHub for collaboration on data with long-term data storage. Ideally, I'd want only one copy of each dataset, but I'm not sure GitHub is the correct location for long-term storage, therefore I have to either have two copies of datasets, or temporarily move things to GitHub and then to long-term storage.</li>
+            <li class="list-group-item">I use LTER Network tools.</li>
+            <li class="list-group-item">I use a variety of existing software packages that address all or most of the issues in the previous question.</li>
+            <li class="list-group-item">I wish there were tools for more easily documenting changes to query structure in relational databases.</li>
+            <li class="list-group-item">I work in chemistry. I would like disparate data to carry an RFID like tag that can easily collated by another software rather than forcing the student to always curate. Automate the coherent collection of all data into one location</li>
+            <li class="list-group-item">I work with Google Docs. I'm not sure that is what you mean.</li>
+            <li class="list-group-item">I work with fossils from other countries that I photograph for future use - these are not particularly well-preserved fossils and they are identified to different taxonomic levels. I'd like a place to deposit these images and have them be searchable and groups based on stratigraphic relationships (I think Marcostrat and PaleoBioDB have attempted this, but they don't have a place for many many many photos)</li>
+            <li class="list-group-item">I would like to digitize and organize data from cabinets at a field station.</li>
+            <li class="list-group-item">I would like to have an easy to use tool to document comments on individual data bits in a large data file preserved in excel, a database format, or something similar.</li>
+            <li class="list-group-item">I would need more information on what a "software preservation quality tool" is to answer this. I do develop software that produces large amounts of data for both scientific and educational settings.</li>
+            <li class="list-group-item">I'd like to use version control in my group among team members, but be able to see who did what.</li>
+            <li class="list-group-item">I'm collecting a large amount of RFC 4898 TCP stack data that could use effective de-identification and management tools.</li>
+            <li class="list-group-item">I'm not completely sure what you mean. Maybe this - I have old stopped-flow data created on an old Mac-driven system. It'd be pretty tough to look at those data now.</li>
+            <li class="list-group-item">I'm not sure - we have code ( openmd.org ) and data (large trajectory files) that could be curated and archived better than on CRC afs space.</li>
+            <li class="list-group-item">I'm not sure what you mean by "preservation quality tool."</li>
+            <li class="list-group-item">I've planned on using the widely used version control system, git, for my code</li>
+            <li class="list-group-item">I've worked with PSLC's DataShop in the past, and would love a more general tool for education data that is not action-level from a system.</li>
+            <li class="list-group-item">Identifying cases where de-anonymization is possible; reliable provenance and timeliness indicators.</li>
+            <li class="list-group-item">If I understand the question correctly, what would be useful to know is who worked on what, in what sequence, and what the exact updates were. Currently, much of this is accomplished through Github, Dropbox, and Microsoft Word tracking which has a combination of these abilities.</li>
+            <li class="list-group-item">Interwoven data sets, with some common variables shared.Which variables are shared across sets changes.</li>
+            <li class="list-group-item">It's not something I've thought very hard about, beyond satisfying NSF preservation requirements and enabling replication.</li>
+            <li class="list-group-item">Keeping track of multiple projects over years</li>
+            <li class="list-group-item">Large data and video files that must be made available</li>
+            <li class="list-group-item">Large data files. Software preservation is done through Github/open source.</li>
+            <li class="list-group-item">Linux Provenance Modules</li>
+            <li class="list-group-item">Many tools exist... I never know the best one to select, and they're all difficult to search practically. They need to be user-friendly from the perspective of a data user, rather than the provider of data and the data manager</li>
+            <li class="list-group-item">Maybe, but we develop quality assessment tools ourselves and can tailor them to our specific needs.</li>
+            <li class="list-group-item">Method to archive assign DOIs to reusable workflows - see [our project]</li>
+            <li class="list-group-item">Model My Watershed online GIS in the WikiWatershed.org toolkit</li>
+            <li class="list-group-item">Montage image mosaic engine</li>
+            <li class="list-group-item">More than I want to take the time to describe here</li>
+            <li class="list-group-item">Much useful phylogenetic and microscope image analysis/control software becomes difficult or impossible to use only because Mac and PC operating systems change. Such software would still be useful if it were updated!</li>
+            <li class="list-group-item">Multiple ad hoc bioinformatics pipelines vulnerable to changes in data and software versions.</li>
+            <li class="list-group-item">My case is more on the data side, regarding workflow and provenance.</li>
+            <li class="list-group-item">My main problem is WHERE to archive and preserve my data and software. I do not have a permanent (or even temporary) project website and I do not believe that NSF offers a place to archive project data. I often work with Stata, SAS or Excel, so I do not see a major problem with documentation and preservation unless, perhaps you wish to move everything to a flat ASCII file. A more serious preservation problem comes from using proprietary programs such as AnyLogic (www.anylogic.com) or TreeAge (www.treeage.com) where version changes can make it difficult to run older versions of these programs.</li>
+            <li class="list-group-item">Need a better option for permanent archival and curation of datasets and minting of DOIs.</li>
+            <li class="list-group-item">Need a tool that can help anonymize data prior to sharing.</li>
+            <li class="list-group-item">Network-related experiments such as for Internet measurements or security/privacy are hard to undertake and replicate. Some tool to help "standardize" this type of experiment would be useful.</li>
+            <li class="list-group-item">No, I am actually leading a data preservation project for NSF in my field of atmospheric chemistry so I wanted to see how these tools are being developed elsewhere.</li>
+            <li class="list-group-item">No, I do mainly theoretical research and have minimal data needs.</li>
+            <li class="list-group-item">No, at present our needs are met by existing tools (github, etc.)</li>
+            <li class="list-group-item">No, but we have some advanced tools we've developed in house. We've been the subject of an ethnographic study on our software tool development, with significant overlap on this issue.</li>
+            <li class="list-group-item">No, my field uses github which does some of this</li>
+            <li class="list-group-item">No, the ones I checked above as most useful exist in Linux (e.g. version control systems)</li>
+            <li class="list-group-item">No.  But we anticipate a need in the next 2 years.</li>
+            <li class="list-group-item">No.  We make use of the OSF (osf.io) for collaboration and openness</li>
+            <li class="list-group-item">No.  We use github, containerization, FAIR practices.</li>
+            <li class="list-group-item">Nope - we archive our educational materials on partner websites</li>
+            <li class="list-group-item">Not at this time but data management is a focus overall</li>
+            <li class="list-group-item">Not at this time. My current approach is to store my software in public/private GitHub repos. If we want to release software developed as part of our research, we add an open source license to it and switch the repo from private to public.</li>
+            <li class="list-group-item">Not really. I typically work with data that is stored on a community server and is accessed as needed. A key aspect of the data (seismic) is that it is in a nearly raw state and uniformly saved to maximize its ability to be used in new ways.</li>
+            <li class="list-group-item">Not sure. It is not a priority given other considerations.</li>
+            <li class="list-group-item">Not sure. We have CODAP, an online open source platform/library. It logs data of student actions. Does that come under this project?</li>
+            <li class="list-group-item">Nothing in particular. In general I need a place to archive code and data for journal articles.</li>
+            <li class="list-group-item">Possibly - too early to know for sure.  Ask again in 1 yr.</li>
+            <li class="list-group-item">Possibly, but how would this be better than existing tools?</li>
+            <li class="list-group-item">Possibly. I have many data sets that need to be archived.</li>
+            <li class="list-group-item">Preservation of analytical data from archaeological assemblages</li>
+            <li class="list-group-item">Preservation of mathematical software tools in a runnable, resusable form.</li>
+            <li class="list-group-item">Preservation of software (and associated workflow) related to published papers</li>
+            <li class="list-group-item">Preservation of theoretical software tools in HEP (FEWZ) http://gate.hep.anl.gov/fpetriello/FEWZ.html</li>
+            <li class="list-group-item">Preservation of various levels of community data, and associated software</li>
+            <li class="list-group-item">Preservation tools for qualitative data would be really useful!</li>
+            <li class="list-group-item">Preserve large amounts of mysql dumps, python notebooks, etc</li>
+            <li class="list-group-item">Preserving data</li>
+            <li class="list-group-item">Presevration and tracking of custom data from annotated videos</li>
+            <li class="list-group-item">Probably not at this time - we use some standard version control/tracking software for software tool development that works well for us currently</li>
+            <li class="list-group-item">Probably not, but workflow preservation tools are interesting</li>
+            <li class="list-group-item">Protocol navigator, it acquires meta data</li>
+            <li class="list-group-item">Provenance tools</li>
+            <li class="list-group-item">Providing permanent PI accounts on open git repos (e.g., bitbucket, github. etc) would go a long way to preserving data.   This is not so much the lack of a tool, but the lack of permanent funding to use a tool.</li>
+            <li class="list-group-item">Public data hosting repository with permanent reference to be used in published articles. Perhaps a link/reference to the published article.</li>
+            <li class="list-group-item">Quality tool, De-identification tool</li>
+            <li class="list-group-item">SQL database</li>
+            <li class="list-group-item">Secure, affordable/free long-term storage & data sharing option</li>
+            <li class="list-group-item">So far I am posting my papers on ArXiv and don't have much other data that needs to be officially preserved.</li>
+            <li class="list-group-item">Software stack "versioning" - ensuring software / scripts can be re-used long after release</li>
+            <li class="list-group-item">Something like this [LIGO Document Control Center Portal url provided] but robust and distributable backed by a google strength team</li>
+            <li class="list-group-item">Something to help with storage of experimental data in a single location, accessible from anywhere</li>
+            <li class="list-group-item">Something to keep track of the multitude of different data-file types that our equipment produces, along with the metadata about experimental settings, etc. An easy way to organize and access this information that doesn't require a degree in computer science and only minimal understanding of databases is necessary for any tool to be adopted.</li>
+            <li class="list-group-item">Standards for expressing and encoding provenance</li>
+            <li class="list-group-item">System that can be used during development and quickly clean up and select what should be made public at the time of publication.</li>
+            <li class="list-group-item">The biggest problem I have is that tools from prior work don't work due to software platforms evolving and the tool not getting updated or missing libraries.</li>
+            <li class="list-group-item">The provenance tool would be most useful now, I'm doing some research on the history of glacier exploration in the western US</li>
+            <li class="list-group-item">There are lots of places we could use help...</li>
+            <li class="list-group-item">There is a great need to develop tools for capturing the provenance of biomodels (e.g. data sources and assumptions used to build models) to increase the comprehensibility of models and make models easier to modify and combine</li>
+            <li class="list-group-item">There is a lot of development work out there already.</li>
+            <li class="list-group-item">There is a strong need to be able to record corrections or supplemental data provided by users of our specimens (or their digital representations) as a layer separate from the original specimen metadata but searchable and displayable with original metadata</li>
+            <li class="list-group-item">There is no standard for preserving/publishing NMR and other spectroscopy data for synthesized compounds, analogous to the CIF or PDB.</li>
+            <li class="list-group-item">Too many! However, you might check out the work that Vicky Steeves at NYU has done. Although, youre probably already aware.</li>
+            <li class="list-group-item">Tool to capture metadata with minimum user intervention would be of great help.</li>
+            <li class="list-group-item">Tools that help provide appropriate metadata for computer simulation products I generate, following a template specified by a research program.</li>
+            <li class="list-group-item">Tools that support the proposed Metabolomics Data Standards [respondent provided citations] </li>
+            <li class="list-group-item">Unbdergraduate research projects that span multiple institutions and leverage course embedded research projects would greatly benfit from a shared data tool.</li>
+            <li class="list-group-item">Unsure</li>
+            <li class="list-group-item">Video and physiological data on orofacial movements in humans and animals</li>
+            <li class="list-group-item">Virtual Reality applications</li>
+            <li class="list-group-item">WE HAVE DEVELOPED AN APP THAT IS INTENDED TO GATHER CROWD SOURCED DATA. OUR CONCERN IS PERPETUATING THAT DATA</li>
+            <li class="list-group-item">Way to easily organize, share, and preserve anonymity of data</li>
+            <li class="list-group-item">We already have structures and processes in place for our data management.</li>
+            <li class="list-group-item">We are curating (or helping programs curate) many biodiversity databases.  Helping with metadata, provenance, all this would be useful.</li>
+            <li class="list-group-item">We are struggling with the increase in the usage VMs and Containers in research workflows. Developing a tool to aid in preservation/curation of thes would be extremely helpful.</li>
+            <li class="list-group-item">We deposit data in public repositories such as the Gene Expression Omnibus -  [and] thus use their tools.</li>
+            <li class="list-group-item">We don't have need at this time</li>
+            <li class="list-group-item">We generate roughly 1 TB/yr of data, mostly in the form of stacks and arrays of 2D data (images) and spectra. We extensively use custom code to process this data. We co-develop technical manuscripts and presentations to communicate this data.</li>
+            <li class="list-group-item">We have a good deal of cycle data from engines that must be preserved.</li>
+            <li class="list-group-item">We have collected an archive of ~4000 images of 4th and 4th graders written work on fraction arithmetic problems. These images have each been tagged with ~10-15 identifiers. There are ~500 tags in total with a complex, nested structure. We are interested in developing tools to preserve and expand access to this archive.</li>
+            <li class="list-group-item">We have some software we have developed on GitHub.  We have research data that we have had to construct our own RDBM schema for.   Deidentification of data and good metadata/ontologies would be helpful.</li>
+            <li class="list-group-item">We have two sets of data, both involving numerous student papers as well as surveys, interviews, etc.</li>
+            <li class="list-group-item">We just completed a full analysis of about 150 TB of particle physics data and are publishing the results. This effectively puts this data out in the public domain (partly by requirement of the journal). We do not currently have a way to do this efficiently. More broadly speaking, many other experiments at the national lab I am working at are in a similar situation and the lab itself does not provide for site-wide public data preservation solutions.</li>
+            <li class="list-group-item">We maintain several data resources for both internal and external use and are interested in many such tools, more than a simple survey could cover.</li>
+            <li class="list-group-item">We need a tool that will help our users better manage their data.  Manage means - deposit, attach metadata, attach DOIs, etc.</li>
+            <li class="list-group-item">We need a tool to preserve the workflow in either xml or json format.</li>
+            <li class="list-group-item">We need both data and software preservation tools, as well as training to use them for our projects that develop and apply first-principles calculations to carrier dynamics in materials</li>
+            <li class="list-group-item">We need tools for data consolidation and maintenance</li>
+            <li class="list-group-item">We use GitHub to preserve software -- that tool is sufficient.  GitHub does not handle large digitial files.</li>
+            <li class="list-group-item">We use google docs and leave suggestions/comments</li>
+            <li class="list-group-item">We use the tools freely available to us at [our university].  De-identified data is stored electronically on secure [university] servers to which only project and research team members have access. Hard-copy data is housed and managed by project evaluation and research team and PI, and kept for only 1 year following the project year they were collected.  For long-term use, data is housed in [departmental] secure file server.  Access to all research files on the server are protected using NTFS permissions, thus restricted to only those individuals with appropriate individual or group-level permissions.</li>
+            <li class="list-group-item">We would dearly love a tool that helps us with a project that collects reams of image data (confocal and widefield) and then quantifies images. An ability to move between Zen Black, Zen Blue, Fuji, and other image analzysis software would be amazing - if this is possible?</li>
+            <li class="list-group-item">We write code to perform our measurements (in Labview). It would be helpful to know what version of the software was running to take particular dataset. We have thought about using SVN or hg but these are cumbersome solutions</li>
+            <li class="list-group-item">We're planning to develop a software preservation portal that might be an avenue for collaboration.</li>
+            <li class="list-group-item">Wea re creating databases of images of forams including manual segmentation; We are creating databases of wearable data for individuals including physiological and environmental sensing</li>
+            <li class="list-group-item">What I really need is a way to share resources (e.g., research-based instructional materials) that will be available to the public in perpetuity, without having to worry about maintaining a server, fixing breakage as infrastructure software evolves and updates, etc. (It's a problem many of us in Physics Education Research have.)</li>
+            <li class="list-group-item">Working on a website to store curriculum modules.</li>
+            <li class="list-group-item">Wow, that's a really interesting question.  My primary focus these days seems to be Visual Analytics.  I would be very interested in a system for preserving and annotating visualizations.  One of the most critical failures I see in final analyses of data, is that dozens of visualizations of the data may be generated, and these are so poorly annotated and cataloged that it becomes almost impossible to reproduce an identical visualization after even a few days of mental bit-rot.  The result is an ever-growing stack of randomly stored visual analyses that are essentially useless, because it's impossible to completely understand their content.  If you're actually interested in collaborating, this is a sufficiently interesting project that it might be worth talking to the NSF about specifically funding it.</li>
+            <li class="list-group-item">Yes, I am part of a teem working on the development of software for biodiversity specialists. We are trying to envision all those issues in our product.</li>
+            <li class="list-group-item">Yes, data about pharmaceutical quality and about lead assay results</li>
+            <li class="list-group-item">Yes, metadata and persistent identifiers for both individual data and data bundles</li>
+            <li class="list-group-item">Yes, we have extensive longitudinal data files and could use many types of tools to make it easier to archive the data set</li>
+            <li class="list-group-item">Yes, we have lots of DNA sequence data that are difficult to archive and distribute. We use Github to make reproducible scripts also for dissemination but I am concerned about longevity issues.</li>
+            <li class="list-group-item">Yes.  i am currently curating a metadata set for a five-year NSF project with multiple types of data in multiple formats.  i would be grateful for a tool that would help me do this curation efficiently and effectively.</li>
+            <li class="list-group-item">Yes. As our work is funded by NSF, we have to comply with their desires for data management.</li>
+            <li class="list-group-item">Yes. Currently working on the best format for preserving the data collected by the project.</li>
+            <li class="list-group-item">Yes. Data base of atmospheric cloud measurments and data processing software</li>
+            <li class="list-group-item">Yes. I need a tool to manage data and metadata and version control.</li>
+            <li class="list-group-item">[respondent creates widely used softare] Currently the data and software are archived in different ways in different places.</li>
+            <li class="list-group-item">[respondent describes a need where they have] de-identified data by hand in order to be able to publish the data and [need] for additional tools that remind about potential decisions, or that could even take a data set and automatically de-identify for public presentation, are potentially useful.</li>
+            <li class="list-group-item">[respondent describes developing] an organization standard for brain imaging data  and [how] it would be great to get additional help with building out the validator and related tools</li>
+            <li class="list-group-item">[respondent describes] large software project (Einstein Toolkit) which generates data (gravitational waveforms) which are used by other projects, where it would be important to have such tools.</li>
+            <li class="list-group-item">[respondent has] Numerous investigators that has interest in facilitating the access, maintenance, and preservation of various kinds of science based models for managing water quality and living resources in the watershed, airshed, estuary, etc. and our investigators also of course have "data management" needs associated with their research grants and publications</li>
+            <li class="list-group-item">[respondent provided URL to a paper on LACE2: Better Privacy-Preserving Data Sharing for Cross Project Defect Prediction] http://menzies.us/pdf/15lace2.pdf</li>
+            <li class="list-group-item">[respondent provided grant number ] </li>
+            <li class="list-group-item">[respondent] disseminates and archives modeling software, but relies on GitHub for version control. Preservation capability would be useful.</li>
+            <li class="list-group-item">a GitHub.com plugin for scientific software</li>
+            <li class="list-group-item">a tool that can keep software current/updated/working with the latest versions of OS and programming languages/compilers</li>
+            <li class="list-group-item">a way to categorize and archive coding choices and decisions over organization of data</li>
+            <li class="list-group-item">aerosol forcing data</li>
+            <li class="list-group-item">all software stops working after a while because the environment changed</li>
+            <li class="list-group-item">assistance with preservation of audio data</li>
+            <li class="list-group-item">cloud-based storage associated with PI rather than institution.</li>
+            <li class="list-group-item">collaboration tools.  Robust and compatible with Word, as easy too use as Google Drive, and tracks changes by user as well as Word does.</li>
+            <li class="list-group-item">converting data in old (no longer used) data formats into plain text</li>
+            <li class="list-group-item">data: large scale proteomics, transcriptomics and metabolomics</li>
+            <li class="list-group-item">data</li>
+            <li class="list-group-item">de-identifying</li>
+            <li class="list-group-item">detailed research data</li>
+            <li class="list-group-item">different tools for each category listed above</li>
+            <li class="list-group-item">easier ways to resolve conflicts in github so that more people will use it without fearing entering a state they cannot navigate</li>
+            <li class="list-group-item">git and mercurial already do a good job of most of these things.  What we need is for the NSF and other funding agencies to REQUIRE PIs to use good practices.</li>
+            <li class="list-group-item">github</li>
+            <li class="list-group-item">how to assess comprehensiveness of archive files</li>
+            <li class="list-group-item">hydroshare.org could benefit from this.</li>
+            <li class="list-group-item">i have data of all kinds and have not really thought about preservation</li>
+            <li class="list-group-item">integrated use of identifiers from trusted sources (wikidata, orcid ...)</li>
+            <li class="list-group-item">integration within Jupyter</li>
+            <li class="list-group-item">jupyter notebooks on github</li>
+            <li class="list-group-item">laboratory data on sediment transport experiments and computer models</li>
+            <li class="list-group-item">large streams of time-series data that is interconnected even when in separate files</li>
+            <li class="list-group-item">long-term data for several decades that contains information on multiple thousands of individuals</li>
+            <li class="list-group-item">multivariate data analysis</li>
+            <li class="list-group-item">no, but would be glad to use/test anything coming out of the project</li>
+            <li class="list-group-item">no, our data quality is addressed at the analytical stage.</li>
+            <li class="list-group-item">normally use github</li>
+            <li class="list-group-item">not really - my research is mostly with VR tool-building and human subjects experiments in immersive virtual environments</li>
+            <li class="list-group-item">not really because there are so many kinds of data and its only a trained human eye that can tell whether the original data along with experimental conditions was recorded completely.</li>
+            <li class="list-group-item">not sure</li>
+            <li class="list-group-item">not that I am immediately aware of, but I would be interested in exploring what is developed</li>
+            <li class="list-group-item">no</li>
+            <li class="list-group-item">personal diligence is better than hard-to-use tools</li>
+            <li class="list-group-item">previously uncurated data associated with astronomical journal publications</li>
+            <li class="list-group-item">refining specimen lists based on precision/resolution of locality data would be cool</li>
+            <li class="list-group-item">repositories of benchmarks for research in VLSI CAD</li>
+            <li class="list-group-item">synchrotron tomography data processing</li>
+            <li class="list-group-item">the concept/ keyword tagging would be amazing.</li>
+            <li class="list-group-item">tool checking  published metabolite tables for matching names to structure or DB identifiers</li>
+            <li class="list-group-item">tool that helps to define and then confirm Climate and Forecast Metadata standards for unstructured grid ocean models</li>
+            <li class="list-group-item">tool that summarizes the IP, terms of use, etc., from the data source</li>
+            <li class="list-group-item">vr environment</li>
+            <li class="list-group-item">we are struggling with project management tools due to a multi lab pipeline for generating data</li>
+            <li class="list-group-item">will need to comply with NSF rules to make qualitative interview data publicly available to other scholars w anonymization</li>
+            <li class="list-group-item">yeah, but it will be very complicated to develop.</li>
+            <li class="list-group-item">yes massive amounts of field reconnaissance data collected by different PIs with different instruments across dates and locations.</li>
+            <li class="list-group-item">yes, anonymizing data to share with others</li>
+            <li class="list-group-item">yes, energy data that has bee collected</li>
+
+        </ul>
+
+        <h3>Is there a tool gap in your digital ecosystem or workflow?
+            <small class="text-muted">(tools_gap)</small>
+        </h3>
+
+        <ul class="list-group scroll">
+
+
+            <li class="list-group-item">A Mac/PC compatible research log that feels like the traditional laboratory notebook</li>
+            <li class="list-group-item">A clearly appropriate repository for data relating to a publication.</li>
+            <li class="list-group-item">A database that links raw data and all analyses, results, or publications associated with that data</li>
+            <li class="list-group-item">A gap exists in porting data from platforms (or resources) that support active use, to archival or preservation-oriented platforms.</li>
+            <li class="list-group-item">A huge gap i.e. from raw data to scripts to final statistics different software is used as raw data can be acquired in different tools. So most processes e.g. de-identifying is done semi-manuell</li>
+            <li class="list-group-item">A simple database to backup, store, and share data would be helpful. My data files are large, so TB of storage would be needed. Due to this, the database could run on a server such as Amazon web services</li>
+            <li class="list-group-item">A tool for multi-stie data sharing.</li>
+            <li class="list-group-item">A tool to widely invite and manage data from multiple sources</li>
+            <li class="list-group-item">A way to hide previous versions behind the current would be useful</li>
+            <li class="list-group-item">A workflow versioning/cloning/preservation system that has a shallow learning curve for undergraduates</li>
+            <li class="list-group-item">API i/o to gov databases like uniprot</li>
+            <li class="list-group-item">Ability to interface/move data among different applications aimed at similar tasks (recording digital specimen data)</li>
+            <li class="list-group-item">Acquiring matrices from users is manual, as is archiving them.  It would be great have a tool directly accessible from MATLAB that says 'save this data forever' in my collection.</li>
+            <li class="list-group-item">All my data are stored piecemeal as it is generated, and I would like to eventually have a single database</li>
+            <li class="list-group-item">An easy to use database to quickly search and retrieve data from multiple different types of simulations would be beneficial. Reproduction of literature description of simulations is also challenging.</li>
+            <li class="list-group-item">An easy way to store data so that it is accessible.</li>
+            <li class="list-group-item">An electronic lab book that actually works well</li>
+            <li class="list-group-item">Analysis tools that don't result in proprietary files.</li>
+            <li class="list-group-item">Anonymization is the main challenge. It would seem this is becoming an impossible goal however.</li>
+            <li class="list-group-item">Are there any environments for preserving antiquated web applications?</li>
+            <li class="list-group-item">As before, still working on selecting the system for storing the data.</li>
+            <li class="list-group-item">At present, the Johns Hopkins University library has a data management team that is doing an excellent job of managing data in publications.  The system also houses software, but these features are new and I am not as familiar with their capabilities and weaknesses.  I do know that they are more for archiving and reference and do not facilitate active management with version control.</li>
+            <li class="list-group-item">At this point, we are looking at ways to make data accessing, data managment and software sharing more accessible across multiple institutions</li>
+            <li class="list-group-item">Autogeneration of metadata, one-click upload to institutional repository.</li>
+            <li class="list-group-item">Automatic acoustic speech analyses would be terrific. Unfortunately, that is tricky.</li>
+            <li class="list-group-item">Automatic name replacement or removal doesn't provide the anonymous level required</li>
+            <li class="list-group-item">Bascially, we have been using fairly standard tools; Excel work sheets, basecamp, project directories, Oracle for more detailed work.  What I miss is an effective template for organizing data from different sub-sets of the project to show its relation to other sub-sets and the whole project.</li>
+            <li class="list-group-item">Better to ask our tDAR developers.  Automated conversion of diverse digital objects to preservation formats is one.</li>
+            <li class="list-group-item">Better tools for metadata creation. More user-friendly. Wizard-like.</li>
+            <li class="list-group-item">Bitbucket, SourceTree</li>
+            <li class="list-group-item">Capturing the whole workflow and changes across disparate things (scripts, programs, config files, ...)</li>
+            <li class="list-group-item">Code is easy to maintain and share on GitHub. Making large datasets available is a bigger challenge. A free git for large data sets would be great.</li>
+            <li class="list-group-item">Collapsing & expanding large data sets easily to see larger trends</li>
+            <li class="list-group-item">Common collection site for student's and other internally developed code</li>
+            <li class="list-group-item">Coupling models that use different variables, data formats, etc.</li>
+            <li class="list-group-item">Curating digital workflows is time consuming.  An independently verified workflow tool would be nice</li>
+            <li class="list-group-item">DOn't think I have a digital ecosystem. I have files and backups</li>
+            <li class="list-group-item">Data backup does not happen immediately on our system but must be manually commanded.</li>
+            <li class="list-group-item">Data file curation from CRC afs space would be wonderful.</li>
+            <li class="list-group-item">Data upload/download</li>
+            <li class="list-group-item">Data, derived data, metadata</li>
+            <li class="list-group-item">Development of metadata for a data set that adheres to a research program's standard, including accessing a library of standard names, units for the data, its space-time descriptors and generation sources and methods.</li>
+            <li class="list-group-item">Digital repositories, esp. for sharing / merging computational and experimental results</li>
+            <li class="list-group-item">Digital scholarship workflows are not well defined and often rely on 3rd party software. Assessing those softwares would be helpful (i.e. Scalar, timeline.js)</li>
+            <li class="list-group-item">Easily getting data out of the databases in a useable form for different end-users and making sure that quality issues are flagged in a way that will be apparent.</li>
+            <li class="list-group-item">Easy version control for wet lab protocols</li>
+            <li class="list-group-item">Expertise in using relational database software (Filemaker)</li>
+            <li class="list-group-item">File conversions (netCDF -&gt; ArcGIS raster, for example) remains a time sink. A tool to easily convert common filetypes would be useful.</li>
+            <li class="list-group-item">Finding a way to track changes in data analysis-i.e. which data sets are most current, modified, ability to return to initial unedited data</li>
+            <li class="list-group-item">For now Git(Hub) works pretty well for our needs + institutional library infrastructure.</li>
+            <li class="list-group-item">For the moment there is no digital ecosystem support for research offered to professors at our institution</li>
+            <li class="list-group-item">For this type of project, we don't have an end to end workflow. Much of the processing is ad hoc pieced together from tools available online.</li>
+            <li class="list-group-item">Free and open electronic lab notebook software integrating chemical structures</li>
+            <li class="list-group-item">Frequently, data capture, processing and analyses must be performed in different software packages, which often don't read the same file formats. I'm constantly looking for methods to simplify this. Currently, I'm diving into R as a one-stop shopping tool; however, the difficulties here are with identifying what tools to use when and learning how to use them.</li>
+            <li class="list-group-item">GPU support for tools like Jenkins</li>
+            <li class="list-group-item">Gap between raw data and stored annotated data - big data</li>
+            <li class="list-group-item">Good and intuitive project management tools: task assignment and tracking and tagging across projects.  Intuitive organization and easy to update.</li>
+            <li class="list-group-item">Good latex sourcecode annotation</li>
+            <li class="list-group-item">Good task management software</li>
+            <li class="list-group-item">Had to get help with importing spreadsheet (Excel) data into a data matrix format</li>
+            <li class="list-group-item">Hard to say whether what we now do by hand is automatable or not...</li>
+            <li class="list-group-item">Having an interactive Gantt chart would be helpful - assigning tasks and checking off tasks would be functional</li>
+            <li class="list-group-item">Heterogenous Data management</li>
+            <li class="list-group-item">Huge gaps. We are an academic lab with limited resources, thus we cannot develop sophisticated data management tools from the ground up.</li>
+            <li class="list-group-item">I am embarrassed to admit that we are way behind in the process of preparing and sharing our data with other members of the research community.  One consideration that has kept us on the sidelines for too long is that we conduct research on public understanding of climate change, and we are concerned (and we have funders who are concerned) that our data, if made publicly available, will be used by opponents of climate action to confuse the public and delay climate action.  So, selective sharing of data with only qualitified research is an interest of ours.</li>
+            <li class="list-group-item">I currently don't have any digital workflow or project coordination tools besides e-mail and dated files</li>
+            <li class="list-group-item">I do event data development, which means content coding of (typically) news stories.  Keeping track of multiple coder marks is critical to this process and evaluating inter-coder reliability</li>
+            <li class="list-group-item">I do need better means to document procedures used to treat data and to release intermediate data products.</li>
+            <li class="list-group-item">I do not even have a digital workflow yet.......</li>
+            <li class="list-group-item">I do not have a convenient storage open to the community to large collection of computaitional data that was obtained in the last few years</li>
+            <li class="list-group-item">I do systems research; reproducing those sorts of things requires specific HW and very controlled execution environments.</li>
+            <li class="list-group-item">I don't even know enough to know where that gap woudl be. I use data management provided by my research site and/or institute... so it changes a lot. None of them are easily searchable when I'm looking for someone else's data.</li>
+            <li class="list-group-item">I don't have a workflow ... so that's my gap</li>
+            <li class="list-group-item">I don't have the resources (personnel, time, money, etc.) to diligently document all the data my research group generates.</li>
+            <li class="list-group-item">I don't think so. There are a lot of good tools out there for analysis, version control, and digital note taking.</li>
+            <li class="list-group-item">I have copies of questionnaires and SPSS files from many past surveys. Anything that would help me go beyond that stage with a minimum of effort would be a help</li>
+            <li class="list-group-item">I have no idea what "digital ecosystem" or "workflow" mean.</li>
+            <li class="list-group-item">I have tried a variety of tools to serve as "Digital Lab Notebooks"--and none of them are very good.</li>
+            <li class="list-group-item">I move between many tools and those connections could be automated or at least turned into a standard workflow.</li>
+            <li class="list-group-item">I need safe, easy-to-access cloud data storage.  This is not as easy to find as you might think.</li>
+            <li class="list-group-item">I share data via standard repositories (e.g., Dryad) but am otherwise old-school and wouldn't really know where to begin in response to this question.</li>
+            <li class="list-group-item">I use Asana to track projects, but I don't want to pay for the professional version that has the tools I really need.</li>
+            <li class="list-group-item">I use R for most of my data analysis, but am on several working groups for evaluation of STEM education programs. Would love a tool to let programs contribute data from common assessments and then run basic EDA and statistics.</li>
+            <li class="list-group-item">I use RMarkdown for drafting manuscripts (good reproducibility), but find other tools (like google docs) better for collaborative editing, especially with collaborators who do not use R markdown. What's difficult is bridging the gap between the two without error. Current approach is to use a diff-check tool to ensure both versions are the same.</li>
+            <li class="list-group-item">I use excel to prepare data files, put them into JMP for analysis, sometimes going back and forth between excel and JMP. Once the analysis is complete, I use Sigmaplot to graph the data and Word to make the tables. It would be nice to have one package that did all these things, and seamlessly and quickly. I don't us R, partly because it has a steep learning curve and I'm older and don't have time to devote to it, and from observing my students use it, it seems very clunky. JMP is ideal for my needs because it is quick, easy to learn, and interacts well with excel.</li>
+            <li class="list-group-item">I use video data, so it is very tough to anonymize</li>
+            <li class="list-group-item">I work with many other who do not necessarily posses the knowledge to work in relational or graph database environments, so I often get flat files which I have to import myself. I wish I could provide users with a friendly format for them to import their data into a useful structure and provide metadata so that I would have to do less of that on the back end.</li>
+            <li class="list-group-item">I would like something that stores raw digital data, processed data, data graphs, and metadata all in one system.</li>
+            <li class="list-group-item">I would like to be able to set up arbitrary scripts or data elements to aid in metadata creation.</li>
+            <li class="list-group-item">I would like to bring tools for search together into one framework but all existing approaches are very isolated and challenging to apply.</li>
+            <li class="list-group-item">I'd love a tool that allows me to track which projects I'm working on, since i work on so many. For example, I could toggle which project and it would keep track of the time over the course of the week so that I could have an accurate count of time.</li>
+            <li class="list-group-item">I'm new to large data sets, so do not know</li>
+            <li class="list-group-item">I'm not sure - it has been difficult to find a tool that is protected that allows me to upload all of the different types of data into it (especially large video files).</li>
+            <li class="list-group-item">I'm not sure if this is what you are looking for, but we have a need for better notebooks that are easily updatable by multiple individuals but also can be backed up routinely and securely both to the cloud and locally.</li>
+            <li class="list-group-item">I'm wishing to create digital excavation forms (archaeo) and better data archives.</li>
+            <li class="list-group-item">I've started using git several times, but the difficulty of undoing mistakes led me to drop it every time</li>
+            <li class="list-group-item">I've written most of the software that I use myself (since I also designed and built the main data-collecting instrument). Simple ways to securely archive the data are big gaps.</li>
+            <li class="list-group-item">Identifying contributors and contributions at all stages; integrating provenance and identification with dropbox, google drive and other integrated shared folders</li>
+            <li class="list-group-item">If I could export both data and metadata from Samvera, I would use the DC Package Tools to create bags for export, or run them through Archivematica. Automating this workflow would be useful, but not a big gap</li>
+            <li class="list-group-item">In computational hydrology, there are a variety of data sources, formats, software tools, etc that scientists use. There is no simple solution that can handle this variety of data and software tools.</li>
+            <li class="list-group-item">Integration between tools & development of standards are my two major challenges.</li>
+            <li class="list-group-item">Ipad integration</li>
+            <li class="list-group-item">It is difficult for students to keep track of the many files generated in computer simulations on many different platforms.</li>
+            <li class="list-group-item">It is difficult to document the source of a parameter or observation in my datasets and mocedls. For example, Stata now allows rather long labels but I would like an additonal "Source of the data" field apart from the label for the variable.</li>
+            <li class="list-group-item">It is hard to gage compatibility of many existing repositories with future releases of Ubuntu OS and ROS version.</li>
+            <li class="list-group-item">It is still very challenging to capture all the different forms of data we produce in the lab and the field.</li>
+            <li class="list-group-item">It would be nice to be able to migrate between systems -- I currently use git, overleaf, dropbox, and svn, depending on the collaborator. It's not very transparent.</li>
+            <li class="list-group-item">It would be useful to have better tools to manage and curate training data sets that are needed to go with software, but that are too large (~1 TB in size or more) for standard code management tools like git or mercurial to be useful.</li>
+            <li class="list-group-item">Just time to learn new things</li>
+            <li class="list-group-item">Knowing when and who changed what</li>
+            <li class="list-group-item">LIGO has a proprietrary data format supported by an extremely complicated and evolving reader available for a subset of data analysis environment. While poverful and comfortable for insiders, it limits future public access</li>
+            <li class="list-group-item">Long term storage and archiving of very large datasets.</li>
+            <li class="list-group-item">Long term sustainability - archiving material to live after the grant</li>
+            <li class="list-group-item">Lots of gaps.  Most tools are unrelated to each other so a lot of manual tracking.</li>
+            <li class="list-group-item">Lots, but mostly we develop our own tools to fill those gaps.  Tagging of right-to-left scripts was a recent example.</li>
+            <li class="list-group-item">Main problem is getting students to follow procedures.</li>
+            <li class="list-group-item">Maintaining version control. I need to be better about this.</li>
+            <li class="list-group-item">Many.  One critical one is record of the content of a link (e.g., from social media tweet, post)</li>
+            <li class="list-group-item">Metadata tool</li>
+            <li class="list-group-item">Metadata/tagging needs to be easier</li>
+            <li class="list-group-item">More a cultural gap. Data are not often shared between labs.</li>
+            <li class="list-group-item">More a gap in knowing how to use the tools...</li>
+            <li class="list-group-item">Most of the "tools" listed on the first page do not exist in my current data collection, cleaning, and management environment.</li>
+            <li class="list-group-item">Most research in the atmospheric sciences involves analysis of TB (or larger) datasets using custom-coded programs in languages ranging from FORTRAN and C to R and Python.  Archival of such data sets and tracking of the software's evolution (over years or decades) has not been practical.  The solutions I've seen advertised are for vastly smaller datasets and commercial-off-the-shelf (COTS) software.  That's not relevant to the atmospheric sciences.</li>
+            <li class="list-group-item">Most workflowsare external and thus poorly captured, if at all</li>
+            <li class="list-group-item">My university does not support workflows</li>
+            <li class="list-group-item">Need a better option for permanent archival and curation of datasets and minting of DOIs.</li>
+            <li class="list-group-item">Need a tool to help us collect data from multiple surveys and analyze the data</li>
+            <li class="list-group-item">Need a way to easily and effectively navigate versions and cloned resources.</li>
+            <li class="list-group-item">Need better ways to archive a variety of documents and resources in standardized and searchable forms for sharing. Need ways to archive collections of large data files for sharing.</li>
+            <li class="list-group-item">Need digital notebook for lab members and students at reasonable cost</li>
+            <li class="list-group-item">No easy way to publish & preserve python notebooks and data</li>
+            <li class="list-group-item">No extensive metadata tool that is easy to use</li>
+            <li class="list-group-item">No gap, because we are developing our own quality assessment tools in our data analysis pipelines.</li>
+            <li class="list-group-item">No good tools for aggregating data the data needed to build biomodels, organizing this data, using this data to build models, describing how models are built from data, or tracking the provenance of this data</li>
+            <li class="list-group-item">No permanent archive that may be made available outside of the institution</li>
+            <li class="list-group-item">No simple annotation file tracking</li>
+            <li class="list-group-item">No standard databases used. No requirements from journals.</li>
+            <li class="list-group-item">No. There are some challenging de-identification issues when we link our basic data sets to county-based data sets, but most of this requires judgment rather than automation.</li>
+            <li class="list-group-item">No.</li>
+            <li class="list-group-item">Not quite sure what you mean-but it would be helpful to have something that better helps us track data, enter data from multiple data collectors, see where we might be missing data etc-better than access or filemaker pro.</li>
+            <li class="list-group-item">Not sure.  Some of the things described can be done with standard version control software; intent of the others in the questionaire was not clear from the brief description given.</li>
+            <li class="list-group-item">Not sure. Currently, for researchers such as myself, I am not even aware of what tools are out there that could be useful.</li>
+            <li class="list-group-item">Of course there are. It depends on which ecosystem or workflow, which project, which collaborators. You're oversimplifying with this question. Just building more tools isn't going to fix the myriad tool gaps! But there are hundreds if not thousands of researchers who desperately need open source cross-platform multi-user non-cloud-based content analysis software. It's a niche market with such terrible software options that some people actually use Office instead, which is really no better than using highlighters on printouts of transcripts, and quite possibly worse. Dedoose is the only tool that starts to meet the need, and it's simply terrible on a number of dimensions.</li>
+            <li class="list-group-item">Often proper version control software, or its strict use.</li>
+            <li class="list-group-item">Online help and maintenance templates</li>
+            <li class="list-group-item">Only that we don't make good use of existing systems because folks who end up in social sciences are sometimes scared off by the fact that these are generally tailored for use by computer scientists, etc.</li>
+            <li class="list-group-item">Organizing metadata</li>
+            <li class="list-group-item">Our STEM student database.  We have a disconnect between our Office of Institutional effectiveness data and the data we need to track our STEM students.  We have a home-grown system to track students' activities and accomplishments, but it is limited in its capacity.</li>
+            <li class="list-group-item">Our preservation of workflows and computer-generated results is very much ad hoc. We have difficulty associated specific research data with specific publications.</li>
+            <li class="list-group-item">Our workflow occurs through continuous communication - so email, telephone, cloud storage, and video conferencing provide all we currently need.</li>
+            <li class="list-group-item">Perhaps, but immediate problem is sorting through files that were not always in the same format.</li>
+            <li class="list-group-item">Platforms that provide tools</li>
+            <li class="list-group-item">Power and networking monitoring software</li>
+            <li class="list-group-item">Preservatio of workflow and generation of appropriate metadata are both problems.</li>
+            <li class="list-group-item">Preservation and compatibility</li>
+            <li class="list-group-item">Provenance and workflow capture/preservation tools are missing.  No way to preserve large data sets in a re-useable way.</li>
+            <li class="list-group-item">Provenance tools: right now, it's a set of versioned data files... not the greatest solution</li>
+            <li class="list-group-item">Provenance tracking that includes software down to the last library</li>
+            <li class="list-group-item">Provide metadata for others, store large quantities of data (Gb!)</li>
+            <li class="list-group-item">Pushing paleomagnetic data to the cloud and searching the data internally</li>
+            <li class="list-group-item">Reproducing other people's network experiments or understanding exactly what steps other researchers have done in their experiments.</li>
+            <li class="list-group-item">Right now I'm doing a lot of simulation and find it a challenge to keep track of everything.  I keep good notes and a spreadsheet of analyses and parameters but feel there must be a better way</li>
+            <li class="list-group-item">Saving workflows...or giving a workflow to another person</li>
+            <li class="list-group-item">See previous and I use Wiki for process documentation, but it can be difficult to access outside of the network at times.</li>
+            <li class="list-group-item">Software to easily de-identify computed tomography images of patients acquired on multiple vendor CT scanners</li>
+            <li class="list-group-item">Something that helps me keep up with recent related developments in the literature</li>
+            <li class="list-group-item">Somewhat; tDAR has some tools but more would be welcome</li>
+            <li class="list-group-item">Sort of, the accepted databases for paper/manuscript data on major publishers like Elsevier don't include GitHub or Zenodo. They exist, though, so it's not really a gap for me.</li>
+            <li class="list-group-item">Standard way to create a data repository. Is this possible without professional/human support?</li>
+            <li class="list-group-item">Standardization of software is lacking</li>
+            <li class="list-group-item">Storage and annotating workflows.</li>
+            <li class="list-group-item">Storage</li>
+            <li class="list-group-item">Submission of DNA sequence data to GenBank</li>
+            <li class="list-group-item">The biggest gap is not having an integrated task manager like Asana built into the OSF platform.</li>
+            <li class="list-group-item">The entire workflow enterprise for phylogenomics is problematic for those of us who don't wish to invest huge sums of time in learning cryptic bioinformatics programs.</li>
+            <li class="list-group-item">The gap is in merging data collected from multiple instruments to perform retrievals of meteorological parameters. Also the gap is in between processing collected data, cleaning it and plotting.</li>
+            <li class="list-group-item">The gap, I think, is in my knowledge and experience. Better use of R, automation, github I think would address my needs. So, gap is in ease of learning and training. I know there are no shortcuts, but any tool to help learn those is great!</li>
+            <li class="list-group-item">The issue for me is that we have an abundance of workflow and management tools, each project taking on different ones, making it difficult for an individual to manage between systems. E.G. one group loves Trello, another Google, and so on and so forth.</li>
+            <li class="list-group-item">The main gap is due to the prevalence of high energy and nuclear physics specific file formats preventing adoption and reuse of data and algorithms. Translator tools could be very valuable.</li>
+            <li class="list-group-item">The preservation piece is spotty at best</li>
+            <li class="list-group-item">The software to compute and load data is proprietary and weakly maintained, an XML or public standard would be best.</li>
+            <li class="list-group-item">The team has set up a protocol for data managment.</li>
+            <li class="list-group-item">There are good tools already around that we don't use, because I can't get enough of my colleagues to leave their "Email plus Word plus Excel" comfort zone. :(</li>
+            <li class="list-group-item">There are many -- all the issues you asked about and more.  I am in the social sciences which is in even worse shape than the geoscience and the biosciences.</li>
+            <li class="list-group-item">There are many gaps - but I'm a tool-builder by trade, so that's not surprising.</li>
+            <li class="list-group-item">There are many tool gaps in my research workflows. I've tried to fill these gaps by developing software, but the software is usually fragile and not very robust. I don't have research funding to sustain software development in the long run and so I haven't been able to keep all of the tools I have developed current. The tools I use include software for loading streaming sensor data into operational databases, data models for storing and managing the data, software for visualizing and performing quality control post-processing on the data, etc.</li>
+            <li class="list-group-item">There are no readily available tools that can capture the metadata without manually curating the data</li>
+            <li class="list-group-item">There is no simple, standard way to archive data in the way that NSF requires.</li>
+            <li class="list-group-item">This may be out-of-scope, but it would be hugely useful to create some type of CV database tool that could export differing formats from the same set of information, so faculty would not have to constantly re-produce different CV's (i.e. 2-page, full, CV for a public website, CV for P&T)</li>
+            <li class="list-group-item">Tool for organaizing a data librray (like mead librray) but on multiple resourses can be extremly useful</li>
+            <li class="list-group-item">Tools could at least do a better job documenting what version of each library etc. is needed</li>
+            <li class="list-group-item">Tools for analyzing qualitative data don't provide any support for preservation or data sharing.</li>
+            <li class="list-group-item">Tools for brokering</li>
+            <li class="list-group-item">Tools for easily sharing LARGE data-sets with data-sharing agreement requirements</li>
+            <li class="list-group-item">Tools that link conceptual models from different tools.</li>
+            <li class="list-group-item">Tools to automate meta data gathering as users/workflow do their work.</li>
+            <li class="list-group-item">Tracking changes in data files (e.g. from data cleaning and preparation)</li>
+            <li class="list-group-item">Transfer of hand written paper records to digital. Like it or not, hand written records are going to be a fact of life in both the lab and field.</li>
+            <li class="list-group-item">Transferring data or files from our local computers to archival services is laborious and time consuming</li>
+            <li class="list-group-item">Translation to standard data (electrophysiology, fluorescent images)files for open deposition</li>
+            <li class="list-group-item">Understanding metadata and provenance completeness</li>
+            <li class="list-group-item">User friendly bioinformatic tools.</li>
+            <li class="list-group-item">User knowledge--I can build a database but I can't make people use it.</li>
+            <li class="list-group-item">User-friendly database management information</li>
+            <li class="list-group-item">Version numbers, or update notifications</li>
+            <li class="list-group-item">Versioning of GIS datasets - when was something changed and by whom - across multi-institutional projects</li>
+            <li class="list-group-item">Way too much manual effort in anonymizing across multiple data sources.</li>
+            <li class="list-group-item">We are able to make backups of data on our campus, but we do not have checksums or point in thime backups to ensure data have not become corrupt and become part of the backup data.</li>
+            <li class="list-group-item">We are collecting data on game usage. Having a way to make that available to researchers at UVM in real time, without impacting our edu game servers would be helpful.</li>
+            <li class="list-group-item">We are still lacking a tool to find and import georeferences in other databases for identical localities represented in our collection.</li>
+            <li class="list-group-item">We could benefit from many of the suggested improvements to current system, all of which I checked as extremely useful.</li>
+            <li class="list-group-item">We currently have to manually rework the data naming and organization to be more user friendly upon release. This is largely caused by our need to build custom data collection software for our experiments (autonomous robots).</li>
+            <li class="list-group-item">We do not have effect workflow tools or curation tools</li>
+            <li class="list-group-item">We have done well at coordinating between multiple tools and resources that allow a digital ecosystem to be organized and managed. Each has strengths and weaknesses, but also allows for flexibility as needs change. A single tool to do all this would be extremely useful, but not sure whether it is feasible in terms of the flexibility aspect.</li>
+            <li class="list-group-item">We have found tools, but platforms change over time, and it all ends up being in an Excel file.  So simple and stable would be better, but nothing specific now.</li>
+            <li class="list-group-item">We haven't completely developed specific workflows yet for data distribution, but are in the process.</li>
+            <li class="list-group-item">We implement various ad hoc strategies for tracking workflows and provenance</li>
+            <li class="list-group-item">We need a way to database mass spec data in a searchable way.  We also need a simple way to combine mass spec sample groups for simple comparisons.</li>
+            <li class="list-group-item">We need better facilities for making software tools work together</li>
+            <li class="list-group-item">We need to backup multiple versions of large datasets. Also it would be useful to identify the projects and workflow associated with the datasets.</li>
+            <li class="list-group-item">We really need to move to an electronic notebook system; however, I have many concerns that need to be addressed before doing this.</li>
+            <li class="list-group-item">We run huge numbers of experiments, some conceived of, started and ended within minutes. It would be great to somehow archive all of this (software and data), but if it slows down our workflow then that would be problematic.</li>
+            <li class="list-group-item">We struggle to get our analysis pipeline working automatically</li>
+            <li class="list-group-item">We use OSF, but some files (excel spreadsheets for example) won't open in that system.</li>
+            <li class="list-group-item">We use nothing now.</li>
+            <li class="list-group-item">What data?  We're pretty well set for domain data,  and human subjects are externally constrained</li>
+            <li class="list-group-item">While there are certainly tool gaps, often a greater hurdle is linking all of the tools together into an actual workflow that can be successfully documented.</li>
+            <li class="list-group-item">Workflow preservation and automation. Preservation of code build / linked libraries information, and preservation of files that were patched in a given build / calculation. Tools to improve code development would also be welcome</li>
+            <li class="list-group-item">Workflow preservation and reuse</li>
+            <li class="list-group-item">Would like to be able to preserve images and maps as well as other data, and make these searchable.</li>
+            <li class="list-group-item">YES. WE ARE GATHERING A LOT OF DATA, BUT IT IS PURELY INTERNAL AND WHEN OUR FUNDING ENDS OR OUR INTEREST WANES THE DATA WILL BE LOST AND FORGOTTEN</li>
+            <li class="list-group-item">Yes there are gaps in tools for that matter, but it is hard to describe them without going into too much specifics. We identify such gaps and try addressing them in our own work.</li>
+            <li class="list-group-item">Yes, I generate high-throughput physical data that then needs to be transcribed into our current database.</li>
+            <li class="list-group-item">Yes, but it is highly specialized based on our bioinformatics-drive research. Our workflows are constantly changing as new tools and approaches are developed (usually by others).</li>
+            <li class="list-group-item">Yes, database updating.</li>
+            <li class="list-group-item">Yes, few tools exist for provenance of data.</li>
+            <li class="list-group-item">Yes, no standard tool for metadata management</li>
+            <li class="list-group-item">Yes, of course.  Anyone saving heterogeneous data has a gap, usually several.  Again, more that a simple survey could cover.</li>
+            <li class="list-group-item">Yes, the database is limited</li>
+            <li class="list-group-item">Yes, there are significant differences among funding agencies as to the standards of digital preservation and sharing.  This means that every dataset to be archived needs to be customized, along with metadata, often in an awkward (i.e., click-based web form) way.</li>
+            <li class="list-group-item">Yes, tools for tracking data workflow and provenance are lacking.</li>
+            <li class="list-group-item">Yes, tools to monitor, assign, record workflow for team members.</li>
+            <li class="list-group-item">Yes, we don't have any real tools or processes for this at the moment, we are in the beginning stages of building a community data respository to start understanding the issues and providing basic capabilities.</li>
+            <li class="list-group-item">Yes.  For all the things I answered on previous question!</li>
+            <li class="list-group-item">Yes.  There are no community standards for documenting large data sets.  HDF5 is adequate for storing data, but there should be standards for documenting what the data is, when it was acquired, what its units are, and so forth.  There is also no way to guard against data theft (re-use without acknowledgement).</li>
+            <li class="list-group-item">Yes. A database tool that integrates well with different platforms especially linux</li>
+            <li class="list-group-item">Yes. Currently I only used manual reproducibility methods: scripts, notes, record of checksums, etc. Not aware of or tried any tools out there.</li>
+            <li class="list-group-item">Yes. De-identification is not handled yet.</li>
+            <li class="list-group-item">Yes. It is very hard to model 1000 of curves and keep the results secured, automated, comprable</li>
+            <li class="list-group-item">Yes. It's completely ad hoc and varies even student to student (even as the group tries to come up with reasonable shared practices).</li>
+            <li class="list-group-item">Yes: a workflow system for large, distributed-systems experiments</li>
+            <li class="list-group-item">Yes; it is too hard to share our data because there are no standards; my lab is working on a standard framework for neuroscience</li>
+            <li class="list-group-item">a better tool to search pdfs for content</li>
+            <li class="list-group-item">a tool to update software; web-based computing</li>
+            <li class="list-group-item">a) abiltity to make the data anonymous, b) linking person with file changes, c) easily accessing images and quantified data files, d) a way to make the data available online to invited folks</li>
+            <li class="list-group-item">abetter way to connect, preserve and indicate changes</li>
+            <li class="list-group-item">archive data availability and distribution</li>
+            <li class="list-group-item">archiving of software and OS used to create data</li>
+            <li class="list-group-item">automated commenting tool for when code is updated</li>
+            <li class="list-group-item">automated process that manages the change of custodianship / provenance, when data / software has become inactive.</li>
+            <li class="list-group-item">better de-identification tools would be helpful</li>
+            <li class="list-group-item">better document / todo list / annotation integration</li>
+            <li class="list-group-item">better organisation of notes, preprints, data and program files</li>
+            <li class="list-group-item">better segmenters for webpages to aid in analysis and indexing</li>
+            <li class="list-group-item">better tools for crearing wiki based documentation that can also produce document versions, and be linked to code versions</li>
+            <li class="list-group-item">big data metadata archival tool</li>
+            <li class="list-group-item">biggest gap is teaching more students about digital workflows</li>
+            <li class="list-group-item">co-temporal collaboration of dozens of people in the same document in real time</li>
+            <li class="list-group-item">collaborative databases</li>
+            <li class="list-group-item">collection analysis</li>
+            <li class="list-group-item">combining very very large sets of data with missing items by item numbers</li>
+            <li class="list-group-item">concept / keyword nudging</li>
+            <li class="list-group-item">connecting the data and code we develop in-house to the metadata and other standards of repositories. Always seems like a daunting slog to post data, thus easy to put it off.</li>
+            <li class="list-group-item">cross-platform fixity</li>
+            <li class="list-group-item">data lifetime management that integrates regeneration vs retrieval access methods</li>
+            <li class="list-group-item">datasets currently do not have a good way of maintaining metadata</li>
+            <li class="list-group-item">decision tracking</li>
+            <li class="list-group-item">deidentifying quickly</li>
+            <li class="list-group-item">document stored data and archiving analysis scripts across lab members</li>
+            <li class="list-group-item">easily managing duplicate and superseded files</li>
+            <li class="list-group-item">easy automatic backup on Windows + organization of data files</li>
+            <li class="list-group-item">easy to use, freely available laboratory data analysis tool</li>
+            <li class="list-group-item">embedded provenance collection and querying</li>
+            <li class="list-group-item">field data that periodically collected are added to a master data file. This file then has to be used to develop data sheets for next time data collection. This is a laborious process full of potential errors. This reprezents a gap in the workflow.</li>
+            <li class="list-group-item">file format conversion to common</li>
+            <li class="list-group-item">gaps: model provenance to model building; model execution and calibration; model analysis and relationship to data.</li>
+            <li class="list-group-item">geological maps present a special challenge due to their inherent nature of being both data and interpretation.  Currently we are in a electronic format but the general problems that have always existed remain.</li>
+            <li class="list-group-item">git fills most gaps; the only problem we run into is students being afraid of branching/checking in/etc. because conflicts are hard to resolve</li>
+            <li class="list-group-item">good reference management</li>
+            <li class="list-group-item">have not implemented any version tracking for either software or map data</li>
+            <li class="list-group-item">image processing</li>
+            <li class="list-group-item">large enough data storage for large digtial remote sensing files</li>
+            <li class="list-group-item">lifecycle management</li>
+            <li class="list-group-item">making data sets citable</li>
+            <li class="list-group-item">making sure data from excel spreadsheets are entered into a structured, relational database</li>
+            <li class="list-group-item">many; important ones are ways of entering and preserving metadata and data quality and uncertainty</li>
+            <li class="list-group-item">my digital ecosystem is rather unorganized, with many parallel species running wild.</li>
+            <li class="list-group-item">organize data to be easily accessible</li>
+            <li class="list-group-item">paper data of various kinds (not all neat) to digital database</li>
+            <li class="list-group-item">perserving provenance in Mathematica notebooks</li>
+            <li class="list-group-item">preservation of old paper seismograms</li>
+            <li class="list-group-item">provenance tool would be useful to keep track who/when/how curated and changed data/metadata over the years (microscope data live very long time).</li>
+            <li class="list-group-item">see previous response.  I think we need more standardized input of data at the community level; eg, Dryad (ie, more like Genbank)</li>
+            <li class="list-group-item">seismology has multiple tools to do this. Mostly for data preservatoin and use, maybe not for workflows.</li>
+            <li class="list-group-item">shared digital lab notebook?</li>
+            <li class="list-group-item">sharing of essays with multiple drafts; use of Google docs helps but the drafts get lost</li>
+            <li class="list-group-item">simulation configuration documentation, post-processing provenance</li>
+            <li class="list-group-item">the gap is really about getting the tools to work in a reproducible containerized way with our data standard - which we are doing in the BIDS Apps project (http://bids-apps.neuroimaging.io/)</li>
+            <li class="list-group-item">there are many academic tool gaps, given the existence of a very strong electronic design automation software industry.  (Access to commercial tools and "design enablements" is not consistent across research groups.)</li>
+            <li class="list-group-item">there may be. our data are stored by project, and at this point we have accummulated too much and need a way of organizing it at the lab level</li>
+            <li class="list-group-item">tools for rapidly and easily identifying, labeling, and classifying file and documents associated with different experiments</li>
+            <li class="list-group-item">tools that enable old code to still run without modification</li>
+            <li class="list-group-item">tracking revisions to finite element software developed in research</li>
+            <li class="list-group-item">unix pipelines and workflows need to be more accessible</li>
+            <li class="list-group-item">updated FAQ or manual pages for all features put in by the users</li>
+            <li class="list-group-item">version control tools</li>
+            <li class="list-group-item">versioning software specifically for data rather than code</li>
+            <li class="list-group-item">versioning, logging chain of used data+software combinations</li>
+            <li class="list-group-item">we are looking into electronic lab book and collaboration software.  Right now products are mostly biology focussed...</li>
+            <li class="list-group-item">we have plenty of tools - what's lacking is user discipline and adoption</li>
+            <li class="list-group-item">we really need a way to better facilitate metadata record creation, especially for software</li>
+            <li class="list-group-item">we use dropbox, so I defintelt have a little fear that someone might delete or change something that was not correct.</li>
+            <li class="list-group-item">yes we need a better platform for developing algorithms for use on sensitive data</li>
+            <li class="list-group-item">yes, I need a system to help maintain and share resources</li>
+            <li class="list-group-item">yes, microattribution (connected to multiple authoring of data)</li>
+            <li class="list-group-item">yes-getting sequence data from the provider onto the mainframe takes too many steps</li>
+            <li class="list-group-item">yes: I need anonymous Globus Online access to data at a supercomputing site</li>
+
+        </ul>
+
+        <hr>
+        <h1>Researcher Behavior</h1>
+
+        <div class="pair">
+        <h3>How familiar are you with tools used to share, publish, cite and preserve data or software?
+        <small class="text-muted">(res)</small>
+        </h3>
+        <div id="res" class="pie"></div>
+    <script>
+        make_pie('res',[
+                ['Extremely familiar', 56], // green
+                ['Very familiar', 199],     //  cyan
+                ['Moderately familiar', 512], // yellow
+                ['Slightly familiar', 421],  //  pink
+                ['Not familiar at all', 240] // red
+                //['no answer', 426],
+                ]);
+    </script>
+        </div>
+
+    <h3>Do you anticipate publishing or sharing your own data or code over the next five years?
+    <small class="text-muted">(res_pubshare_5)</small>
+    </h3>
+            <div id="res_pubshare_5" class="pie"></div>
+    <script>
+        make_pie('res_pubshare_5',[
+['Definitely will', 761],
+['Probably will', 366],
+['Might or might not', 178],
+['Probably will not', 98],
+['Definitely will not', 28]
+//['no answer', 423]
+]);
+    </script>
+
+    <h3>In the past, how often have you made your research data free to access, reuse, repurpose, and redistribute?
+    <small class="text-muted">(res_open_data)</small>
+    </h3>
+    <div id="res_open_data" class="pie"></div>
+    <script>
+        make_pie('res_open_data',[
+['Always', 226],
+['Usually', 480],
+['About Half the Time', 203],
+['Seldom', 373],
+['Never', 137]
+//['No Answer', 435]
+]);
+    </script>
+
+    <h3>Is any of your data or code published or shared now on a repository or website?
+    <small class="text-muted">(res_pubshare)</small>
+    </h3>
+    <div id="res_pubshare" class="pie"></div>
+    <script>
+        make_pie('res_pubshare',[
+['All that can be', 253],
+['Most', 303],
+['About Half', 186],
+['A little', 436],
+['None', 242]
+//['No Answer', 434]
+]);
+    </script>
+
+    <h3>In the past three years, have you or your research group made publicly accessible the following items through your or your institution's website or a third-party repository?
+    <small class="text-muted">(res_open_data3)</small>
+    </h3>
+    <div id="res_open_data3"></div>
+    <script>
+        var res_open_data3 = c3.generate({
+            bindto: "#res_open_data3",
+            axis: {
+                x: { type: 'category'},
+                y: { label: 'Count'}
+            },
+            legend: { show: false },
+            data: {
+                type: 'bar',
+                order: null,
+                colors: {
+                    count: colorlist[0][0]
+                },
+                x: 'x',
+                columns:[
+                    ['x', 'Raw data', 'Structured databases', 'Processed data', 'Figure/Plot/Table data', 'Software'],
+                    ['count', 502, 280, 721, 685, 581]
+]}});
+    </script>
+
+    <h3>Do you need better tools to share, re-use, cite, publish or preserve your own or others' Data and/or Software?
+    <small class="text-muted">(res_tools_share)</small>
+    </h3>
+    <div id="res_tools_share"></div>
+    <script>
+        var res_tools_share = c3.generate({
+            bindto: "#res_tools_share",
+            axis: {
+                x: { type: 'category'},
+                y: { label: 'Count'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                colors: {
+                    'to share': colorlist_categorical[0],
+                    'to re-use': colorlist_categorical[1],
+                    'to cite': colorlist_categorical[2],
+                    'to publish': colorlist_categorical[3],
+                    'to preserve': colorlist_categorical[5]
+                },
+                x: 'x',
+                columns: [
+                    ['x', 'Data', 'Software'],
+                    ['to share', 719, 295],
+                    ['to re-use', 535, 279],
+                    ['to cite', 454, 269],
+                    ['to publish', 498, 259],
+                    ['to preserve', 815, 378]
+]}});
+    </script>
+
+    <h3>When asked to submit keywords to describe your own or others' research is it usually:
+    <small class="text-muted">(res_keywords)</small>
+    </h3>
+    <div id="res_keywords" class="pie"></div>
+
+    <script>
+        make_pie('res_keywords',[
+['Extremely easy', 209],
+['Moderately easy', 857],
+['Moderately difficult', 267],
+['Extremely difficult', 20],
+['I\'ve never had to submit keywords to describe my work', 48]
+//['No Answer', 453]
+]);
+    </script>
+
+    <h3>When asked to submit keywords to describe your own or others' resarch how accurately do the terms available usually describe your work?
+    <small class="text-muted">(res_keywords_avail)</small>
+    </h3>
+    <div id="res_keywords_avail" class="pie"></div>
+
+    <script>
+        make_pie('res_keywords_avail',[
+['Very accurately', 176],
+['Somewhat accurately', 989],
+['Not Very Accurately', 161],
+['Not Accurately at all', 20],
+['I\'ve never had to submit keywords to describe my work', 51]
+//['No Answer', 457]
+]);
+    </script>
+
+    <h3>Does your employer require you to make any of your publications or data 
+        openly available?
+    <small class="text-muted">(res_employ_open)</small>
+    </h3>
+    <div id="res_employ_open" class="pie"></div>
+
+    <script>
+        make_pie('res_employ_open',[
+['Yes', 233],
+['Not Yet, but they may in the future', 438],
+['No', 724]
+//['No Answer', 459]
+]);
+    </script>
+
+    <h3>Do any of the organizations who fund your work require you to make any of your
+        publications or data openly available?
+    <small class="text-muted">(res_fund_open)</small>
+    </h3>
+    <div id="res_fund_open" class="pie"></div>
+
+    <script>
+        make_pie('res_fund_open',[
+['Yes', 775],
+['Sometimes', 414],
+['No', 210]
+//['No Answer', 455]
+]);
+    </script>
+
+    <h3>Please name the software/tools use use most to share, publish or preserve your 
+research
+    <small class="text-muted">(res_open_tool)</small>
+    </h3>
+
+    Sample of responses:
+
+    <ul class="list-group scroll">
+
+        <li class="list-group-item">3i</li>
+        <li class="list-group-item">AMBER</li>
+        <li class="list-group-item">Academia.edu</li>
+        <li class="list-group-item">Access</li>
+        <li class="list-group-item">Adobe Acrobat</li>
+        <li class="list-group-item">Adobe Photoshop/Raw</li>
+        <li class="list-group-item">Agave</li>
+        <li class="list-group-item">Alaska Arctic Geoecological Atlas (http://alaskaaga.gina.alaska.edu)</li>
+        <li class="list-group-item">Apache</li>
+        <li class="list-group-item">ArXiV</li>
+        <li class="list-group-item">ArcGIS</li>
+        <li class="list-group-item">Avizo</li>
+        <li class="list-group-item">Axiell's KE EMu software</li>
+        <li class="list-group-item">BCO-DMO</li>
+        <li class="list-group-item">BEST</li>
+        <li class="list-group-item">BamBam</li>
+        <li class="list-group-item">Bitbucket</li>
+        <li class="list-group-item">Blog</li>
+        <li class="list-group-item">Box</li>
+        <li class="list-group-item">Browser</li>
+        <li class="list-group-item">CSDMS Model Repository</li>
+        <li class="list-group-item">CUAHSI Hydrologic Information System</li>
+        <li class="list-group-item">CVS/SVN/GIT</li>
+        <li class="list-group-item">Cambridge Crystallographic Database</li>
+        <li class="list-group-item">CurateND</li>
+        <li class="list-group-item">Cureus</li>
+        <li class="list-group-item">CyVerse Data Store</li>
+        <li class="list-group-item">DLM (A LAKE MODEL)</li>
+        <li class="list-group-item">DNASTAR to share DNA sequences</li>
+        <li class="list-group-item">DOIs</li>
+        <li class="list-group-item">DSpace</li>
+        <li class="list-group-item">DataDryad</li>
+        <li class="list-group-item">Databrary</li>
+        <li class="list-group-item">Dataverse</li>
+        <li class="list-group-item">DeDoose</li>
+        <li class="list-group-item">DesignSafe</li>
+        <li class="list-group-item">Digital commons</li>
+        <li class="list-group-item">Dreamweaver</li>
+        <li class="list-group-item">Drobo harddrive storage cluster</li>
+        <li class="list-group-item">Dropbox</li>
+        <li class="list-group-item">Dryad</li>
+        <li class="list-group-item">ESRI</li>
+        <li class="list-group-item">Earth System Grid</li>
+        <li class="list-group-item">EarthChem</li>
+        <li class="list-group-item">Endnote</li>
+        <li class="list-group-item">Ensemble Computing Education Portal computingportal.org</li>
+        <li class="list-group-item">Etsin</li>
+        <li class="list-group-item">Excel</li>
+        <li class="list-group-item">Fedora</li>
+        <li class="list-group-item">Fedora/Samvera</li>
+        <li class="list-group-item">FigShare</li>
+        <li class="list-group-item">Filemaker Pro</li>
+        <li class="list-group-item">Forge</li>
+        <li class="list-group-item">GEO Omnibus</li>
+        <li class="list-group-item">GEO subroutines</li>
+        <li class="list-group-item">GenBank</li>
+        <li class="list-group-item">Gene Expression Omnibus</li>
+        <li class="list-group-item">Git</li>
+        <li class="list-group-item">GitHub</li>
+        <li class="list-group-item">GitLab</li>
+        <li class="list-group-item">Google</li>
+        <li class="list-group-item">Google Drive</li>
+        <li class="list-group-item">Google Scholar</li>
+        <li class="list-group-item">HTML</li>
+        <li class="list-group-item">Hard drives and lab notebooks</li>
+        <li class="list-group-item">Hub0</li>
+        <li class="list-group-item">Hydroshare from CUAHSI</li>
+        <li class="list-group-item">ICPSR site</li>
+        <li class="list-group-item">IDEALS website with the help of the sediment experimentalists network</li>
+        <li class="list-group-item">IDL</li>
+        <li class="list-group-item">IRIS DMC</li>
+        <li class="list-group-item">Ideally, SIUE SPARK http://spark.siue.edu/ but we they are not yet well set up to accept data</li>
+        <li class="list-group-item">In-house TaxonWorks</li>
+        <li class="list-group-item">InDesign</li>
+        <li class="list-group-item">Institution's website</li>
+        <li class="list-group-item">Integrated Data Viewer</li>
+        <li class="list-group-item">Joomla CMS - DocMan</li>
+        <li class="list-group-item">Journals</li>
+        <li class="list-group-item">LTER website</li>
+        <li class="list-group-item">LaTeX</li>
+        <li class="list-group-item">MATLAB</li>
+        <li class="list-group-item">MDSplus</li>
+        <li class="list-group-item">MS Word</li>
+        <li class="list-group-item">Marine Geoscience Data System (MGDS)</li>
+        <li class="list-group-item">Materials Project software and repository (DOE funded)</li>
+        <li class="list-group-item">Mathematica</li>
+        <li class="list-group-item">Matlab</li>
+        <li class="list-group-item">Mendeley</li>
+        <li class="list-group-item">MetabolomicsWorkbench.org</li>
+        <li class="list-group-item">Miami University Scholarly Commons</li>
+        <li class="list-group-item">Microsoft Excel</li>
+        <li class="list-group-item">Microsoft Office</li>
+        <li class="list-group-item">Microsoft SQL server</li>
+        <li class="list-group-item">Microsoft Word</li>
+        <li class="list-group-item">Microsoft access</li>
+        <li class="list-group-item">Microstructural model</li>
+        <li class="list-group-item">MongoDB</li>
+        <li class="list-group-item">Morpho</li>
+        <li class="list-group-item">Mozy in sync and other backup software</li>
+        <li class="list-group-item">MySQL</li>
+        <li class="list-group-item">NASA DAAC</li>
+        <li class="list-group-item">NCAR research data archive</li>
+        <li class="list-group-item">NCBI</li>
+        <li class="list-group-item">NCBI / Genbank</li>
+        <li class="list-group-item">NCBI database</li>
+        <li class="list-group-item">NOAA NGDC database</li>
+        <li class="list-group-item">NODC</li>
+        <li class="list-group-item">NVivo</li>
+        <li class="list-group-item">Neotoma Paleoecology Database www.neotomadb.org</li>
+        <li class="list-group-item">Olex2/Shelx</li>
+        <li class="list-group-item">OneDataShare</li>
+        <li class="list-group-item">Open Context</li>
+        <li class="list-group-item">Open Science Framework</li>
+        <li class="list-group-item">Open access publishers</li>
+        <li class="list-group-item">OpenDAP</li>
+        <li class="list-group-item">OpenICPSR</li>
+        <li class="list-group-item">OpenQBMM</li>
+        <li class="list-group-item">Overleaf</li>
+        <li class="list-group-item">PASTA</li>
+        <li class="list-group-item">PDB files</li>
+        <li class="list-group-item">Paleobiology Database</li>
+        <li class="list-group-item">Pass 8 Fermi pipeline</li>
+        <li class="list-group-item">Peer reviewed publications with extensive supporting information</li>
+        <li class="list-group-item">Personal WWW page</li>
+        <li class="list-group-item">Platform for Experimental Collaborative Ethnography</li>
+        <li class="list-group-item">Protein Data Bank</li>
+        <li class="list-group-item">PubMed</li>
+        <li class="list-group-item">R</li>
+        <li class="list-group-item">RAID software drivers</li>
+        <li class="list-group-item">ROOT</li>
+        <li class="list-group-item">RStudio</li>
+        <li class="list-group-item">Research Gate</li>
+        <li class="list-group-item">SAS</li>
+        <li class="list-group-item">SPSS</li>
+        <li class="list-group-item">STATA</li>
+        <li class="list-group-item">Sakai-based learning management system</li>
+        <li class="list-group-item">Scholarworks</li>
+        <li class="list-group-item">SeaBASS</li>
+        <li class="list-group-item">Sequin (GenBank)</li>
+        <li class="list-group-item">ShareLatex</li>
+        <li class="list-group-item">Skills Commons</li>
+        <li class="list-group-item">Socaster</li>
+        <li class="list-group-item">SourceForge</li>
+        <li class="list-group-item">SourceTree</li>
+        <li class="list-group-item">Specify Software (for museum data management)</li>
+        <li class="list-group-item">Stata</li>
+        <li class="list-group-item">Studiocode</li>
+        <li class="list-group-item">Subversion</li>
+        <li class="list-group-item">Symbiota</li>
+        <li class="list-group-item">Time Machines (Mac OSX)</li>
+        <li class="list-group-item">TopSpin</li>
+        <li class="list-group-item">anecdata</li>
+        <li class="list-group-item">apache</li>
+        <li class="list-group-item">arXiv</li>
+        <li class="list-group-item">authorea</li>
+        <li class="list-group-item">bitbucket</li>
+        <li class="list-group-item">box.com secure storage to share</li>
+        <li class="list-group-item">browser</li>
+        <li class="list-group-item">chemDraw</li>
+        <li class="list-group-item">comses.net</li>
+        <li class="list-group-item">cran.r-project.org (published code)</li>
+        <li class="list-group-item">crawdad</li>
+        <li class="list-group-item">design-safe</li>
+        <li class="list-group-item">digital scholarship</li>
+        <li class="list-group-item">drupal</li>
+        <li class="list-group-item">dryad</li>
+        <li class="list-group-item">einstein toolkit</li>
+        <li class="list-group-item">email</li>
+        <li class="list-group-item">endnote</li>
+        <li class="list-group-item">erdapp</li>
+        <li class="list-group-item">ftp</li>
+        <li class="list-group-item">griidc</li>
+        <li class="list-group-item">idigbio</li>
+        <li class="list-group-item">igv</li>
+        <li class="list-group-item">lab archives</li>
+        <li class="list-group-item">lab website</li>
+        <li class="list-group-item">matLab</li>
+        <li class="list-group-item">nanohub.org</li>
+        <li class="list-group-item">ncbi</li>
+        <li class="list-group-item">netcdf</li>
+        <li class="list-group-item">nextcloud</li>
+        <li class="list-group-item">no "tools"--saved files, text processing.</li>
+        <li class="list-group-item">oceans2.0 (ocean networks canada)</li>
+        <li class="list-group-item">online journals</li>
+        <li class="list-group-item">online publishers/archives</li>
+        <li class="list-group-item">openfmri.org</li>
+        <li class="list-group-item">pgadmin III</li>
+        <li class="list-group-item">python</li>
+        <li class="list-group-item">qualtrics</li>
+        <li class="list-group-item">sequin - genbank</li>
+        <li class="list-group-item">sfst</li>
+        <li class="list-group-item">sftp</li>
+        <li class="list-group-item">solidwork</li>
+        <li class="list-group-item">sourceforge</li>
+        <li class="list-group-item">spss</li>
+        <li class="list-group-item">subversion</li>
+        <li class="list-group-item">svn</li>
+        <li class="list-group-item">sync programs such as Syncback Pro</li>
+        <li class="list-group-item">tDAR (http://tdar.org)</li>
+        <li class="list-group-item">university institutional repository</li>
+        <li class="list-group-item">wiki</li>
+        <li class="list-group-item">xBio:D</li>
+        <li class="list-group-item">xppaut</li>
+        <li class="list-group-item">zotero</li>
+
+    </ul>
+
+    <h3>In your estimation, which of the following currently have the infrastructure 
+required   to provide long-term public
+access to your research data?
+    <small class="text-muted">(res_pub_infrastruct)</small>
+    </h3>
+    <div id="res_pub_infrastruct"></div>
+
+    <script>
+        var res_pub_infrastruct = c3.generate({
+            bindto: "#res_pub_infrastruct",
+            axis: {
+                x: { type: 'category'},
+                y: { label: 'Count'}
+            },
+            legend: { show: false},
+            data: {
+                type: 'bar',
+                order: null,
+                colors: {
+                    Count: colorlist[0][0]
+                },
+                x: 'x',
+                rows: [
+                    ['x', 'Count'],
+                    ['Your research group', 296 ], //1558],
+                    ['Your institution',572 ], //1282],
+                    ['Your funding agency',280], //1574],
+                    ['Third-party repositories',736], //1118],
+                    ['Journal publishers', 509] //1345]
+]}});
+    </script>
+
+    <h3>Do you actively create and manage metadata to make sharing, finding, or 
+        documenting provenance of your own or others' data or code easier?
+    <small class="text-muted">(res_metadata)</small>
+    </h3>
+    <div id="res_metadata" class="pie"></div>
+
+    <script>
+        make_pie("res_metadata", [
+['Always', 85],
+['Most of the time', 223],
+['About half the time', 67],
+['Sometimes', 457],
+['Never', 398],
+['What\'s Metadata?', 139]
+//['No Answer', 485]
+]);
+    </script>
+
+    <h3>How important to your work are Web-based applications that provide access to the 
+following specialized resources?
+    <small class="text-muted">(res_tools)</small>
+    </h3>
+    <div id="res_tools"></div>
+
+    <script>
+        var res_tools = c3.generate({
+            bindto: "#res_tools",
+            axis: {
+                rotated: true,
+                x: { type: 'category'},
+                y: { label: 'Count'}
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                colors: {
+                    'Extremely important': colorlist[3][0],
+                    'Important': colorlist[3][1],
+                    'Unimportant': colorlist[3][2],
+                    'Not at all Important': colorlist[3][3]
+                },
+                x: 'x',
+                groups: [['Extremely important', 'Important', 'Unimportant',  'Not at all Important']],
+                rows:[
+                    // TODO: reorder columns
+                    ['x', 'Extremely important', 'Important', 'Unimportant',  'Not at all Important'],
+                    ['Computational tools', 272, 558, 260, 207],
+                    ['Data collections', 426, 560, 198, 118],
+                    ['Data analysis', 290, 567, 254, 184],
+                    ['Simplified interfaces', 197, 426, 339, 334],
+                    ['Platforms', 274, 606, 292, 120],
+                    ['Finding Articles', 595, 536, 124, 47],
+                    ['Rapidly Publishing', 174, 527, 453, 137],
+                    ['Workflows', 146, 470, 421, 247],
+                    ['Instruments', 241, 260, 289, 499],
+                    ['Educational tools', 189, 590, 334, 177],
+                    ['Citizen science', 111, 445, 446, 288]
+]}});
+
+    </script>
+
+    <h3>Do you create and/or use software, code, or scripts in your research?
+    <small class="text-muted">(res_code)</small>
+    </h3>
+    <div id="res_code" class="pie"></div>
+
+    <script>make_pie('res_code', [
+['Always', 547],
+['Most of the time', 257],
+['About half the time', 84],
+['Sometimes', 288],
+['Never', 159]
+//['No answer', 519]
+]);
+    </script>
+
+    <h3>Have you ever authored software, code or scripts to analyze or produce your 
+        data?
+    <small class="text-muted">(res_author_sw)</small>
+    </h3>
+    <div id="res_author_sw" class="pie"></div>
+
+    <script>make_pie('res_author_sw', [
+['Yes', 905],
+['Can\'t Remember', 37],
+['No', 394]
+//['No answer', 518]
+]);
+    </script>
+
+
+    <h3>Have you ever hired or supervised someone to author software code or scripts 
+        to analyze or produce your data?
+    <small class="text-muted">(res_hire_swdev)</small>
+    </h3>
+    <div id="res_hire_swdev" class="pie"></div>
+
+    <script>make_pie('res_hire_swdev', [
+['Yes', 860],
+['Can\'t remember', 22],
+['No', 455]
+//['No answer', 517]
+]);
+    </script>
+
+
+    <h3>For others to reproduce your results would they need your software, code or scripts?
+    <small class="text-muted">(res_reproduce)</small>
+    </h3>
+    <div id="res_reproduce" class="pie"></div>
+
+    <script>make_pie('res_reproduce', [
+['Always', 155],
+['Most of the time', 315],
+['About half the time', 146],
+['Sometimes', 400],
+['Never', 316]
+//['No answer', 522]
+]);
+    </script>
+
+    <h3>Do you use or revise commercial and/or freeware software, scripts, or tools to 
+analyze or produce your data more often than writing new code or hiring someone to write 
+custom software to analyze or produce data for your project(s)?
+    <small class="text-muted">(res_external_sw)</small>
+    </h3>
+    <div id="res_external_sw" class="pie"></div>
+
+    <script>make_pie('res_external_sw', [
+['Always', 95],
+['Most of the time', 291],
+['About half the time', 227],
+['Sometimes', 428],
+['Never', 281]
+//['No answer', 532]
+]);
+    </script>
+
+    <h3>Please name some of the software/tools you use most to analyze or 
+produce your data
+    <small class="text-muted">(res_external_sw_name)</small>
+    </h3>
+
+    <ul class="list-group scroll">
+
+        <li class="list-group-item">ABAQUS</li>
+        <li class="list-group-item">ACER Conquest</li>
+        <li class="list-group-item">ADAM</li>
+        <li class="list-group-item">AMBER</li>
+        <li class="list-group-item">AMDIS</li>
+        <li class="list-group-item">ANSYS</li>
+        <li class="list-group-item">ANSYS FLUENT</li>
+        <li class="list-group-item">ASE</li>
+        <li class="list-group-item">Abaqus</li>
+        <li class="list-group-item">Access</li>
+        <li class="list-group-item">Adobe Photoshop</li>
+        <li class="list-group-item">Aladin</li>
+        <li class="list-group-item">Anaconda (Python 3.x)</li>
+        <li class="list-group-item">Antelope</li>
+        <li class="list-group-item">Anvil</li>
+        <li class="list-group-item">ArcGIS</li>
+        <li class="list-group-item">Astronomical Image Processing Software</li>
+        <li class="list-group-item">Astropy</li>
+        <li class="list-group-item">Atlas</li>
+        <li class="list-group-item">Autosignal</li>
+        <li class="list-group-item">Aviso</li>
+        <li class="list-group-item">Axiell's Ke EMu</li>
+        <li class="list-group-item">Axon PClamp</li>
+        <li class="list-group-item">BASE-9</li>
+        <li class="list-group-item">BBSketch</li>
+        <li class="list-group-item">BLAST</li>
+        <li class="list-group-item">BinBase</li>
+        <li class="list-group-item">BisQue</li>
+        <li class="list-group-item">Bowtie</li>
+        <li class="list-group-item">Breseq</li>
+        <li class="list-group-item">C/C++</li>
+        <li class="list-group-item">CESM</li>
+        <li class="list-group-item">CGAL</li>
+        <li class="list-group-item">CHARMM</li>
+        <li class="list-group-item">CIAO</li>
+        <li class="list-group-item">CODAP</li>
+        <li class="list-group-item">COMSOL</li>
+        <li class="list-group-item">CellProfiler</li>
+        <li class="list-group-item">Chemstation</li>
+        <li class="list-group-item">CholMod</li>
+        <li class="list-group-item">Cipres Science Gateway</li>
+        <li class="list-group-item">Clojure</li>
+        <li class="list-group-item">CloudCompare</li>
+        <li class="list-group-item">Cobra</li>
+        <li class="list-group-item">Common linux utitilies: xml_grep, sed, grep, awk, Python...</li>
+        <li class="list-group-item">Community Earth System Model</li>
+        <li class="list-group-item">Corinna</li>
+        <li class="list-group-item">Custom software</li>
+        <li class="list-group-item">DAVID</li>
+        <li class="list-group-item">DFT Codes</li>
+        <li class="list-group-item">Datavyu</li>
+        <li class="list-group-item">DeDoose</li>
+        <li class="list-group-item">Dipy</li>
+        <li class="list-group-item">Domo</li>
+        <li class="list-group-item">Drupal</li>
+        <li class="list-group-item">EEGLab</li>
+        <li class="list-group-item">ENVI</li>
+        <li class="list-group-item">ESRI</li>
+        <li class="list-group-item">EasySpin</li>
+        <li class="list-group-item">Eclipse</li>
+        <li class="list-group-item">EinsteinToolkit</li>
+        <li class="list-group-item">Enzo, enzo-project.org</li>
+        <li class="list-group-item">Excel</li>
+        <li class="list-group-item">FEWZ</li>
+        <li class="list-group-item">FLAC (a finite difference program for Fast Lagrangian Analysis of Continua)</li>
+        <li class="list-group-item">Fast Holographic Deconvolution</li>
+        <li class="list-group-item">Fermi Pass 8 pipeline</li>
+        <li class="list-group-item">Filemaker Pro</li>
+        <li class="list-group-item">Firebase</li>
+        <li class="list-group-item">Fortran</li>
+        <li class="list-group-item">GAFQMC</li>
+        <li class="list-group-item">GAMESS, Molpro, Cfour</li>
+        <li class="list-group-item">GAMS</li>
+        <li class="list-group-item">GISMOTools</li>
+        <li class="list-group-item">GMT</li>
+        <li class="list-group-item">GNPS</li>
+        <li class="list-group-item">GSAS</li>
+        <li class="list-group-item">GXSM</li>
+        <li class="list-group-item">Galaxy</li>
+        <li class="list-group-item">Gaussian</li>
+        <li class="list-group-item">Gaussian 16</li>
+        <li class="list-group-item">GenAlEx</li>
+        <li class="list-group-item">GeneSpring</li>
+        <li class="list-group-item">Geneious</li>
+        <li class="list-group-item">Gephi</li>
+        <li class="list-group-item">GitHub</li>
+        <li class="list-group-item">Gnu software, lots of different packages</li>
+        <li class="list-group-item">Goldvarb</li>
+        <li class="list-group-item">Google</li>
+        <li class="list-group-item">Google Earth Engine</li>
+        <li class="list-group-item">Google Sheets</li>
+        <li class="list-group-item">Google spreadsheet</li>
+        <li class="list-group-item">GrADS</li>
+        <li class="list-group-item">GraphPad/ Segmentation based softwares</li>
+        <li class="list-group-item">Grapher</li>
+        <li class="list-group-item">Graphpad Prism</li>
+        <li class="list-group-item">HDExaminer</li>
+        <li class="list-group-item">HEAP</li>
+        <li class="list-group-item">Hadoop</li>
+        <li class="list-group-item">Home made Python and C++ code</li>
+        <li class="list-group-item">HydroShare</li>
+        <li class="list-group-item">IDL</li>
+        <li class="list-group-item">IGOR</li>
+        <li class="list-group-item">INHOUSE CODES</li>
+        <li class="list-group-item">IRAF</li>
+        <li class="list-group-item">IRAF (Astronomy data analysis SW)</li>
+        <li class="list-group-item">Idea InteliJ</li>
+        <li class="list-group-item">IgPet</li>
+        <li class="list-group-item">Igor</li>
+        <li class="list-group-item">Igor Pro</li>
+        <li class="list-group-item">IgorPro</li>
+        <li class="list-group-item">Image J</li>
+        <li class="list-group-item">ImageJ</li>
+        <li class="list-group-item">ImageJ/FIJI</li>
+        <li class="list-group-item">ImageQuant</li>
+        <li class="list-group-item">In house custom</li>
+        <li class="list-group-item">InterBase XE</li>
+        <li class="list-group-item">Interactive Data Languge (IDL)</li>
+        <li class="list-group-item">J.A. Woollam Company WVASE32</li>
+        <li class="list-group-item">JMP</li>
+        <li class="list-group-item">JMP (SAS)</li>
+        <li class="list-group-item">JMP, sklearn, Matlab, CPLEX, ...</li>
+        <li class="list-group-item">Jasp</li>
+        <li class="list-group-item">Java Ocean Atlas</li>
+        <li class="list-group-item">Javascript</li>
+        <li class="list-group-item">Jmp</li>
+        <li class="list-group-item">Julia</li>
+        <li class="list-group-item">Jupyter python</li>
+        <li class="list-group-item">Kaleidagraph</li>
+        <li class="list-group-item">Kaliedagraph</li>
+        <li class="list-group-item">Kinetasyst</li>
+        <li class="list-group-item">Kinetic Studio</li>
+        <li class="list-group-item">LAMMPS</li>
+        <li class="list-group-item">LPILE</li>
+        <li class="list-group-item">Lab View</li>
+        <li class="list-group-item">LabView</li>
+        <li class="list-group-item">Lammps</li>
+        <li class="list-group-item">Landlab</li>
+        <li class="list-group-item">Lapack</li>
+        <li class="list-group-item">Letax</li>
+        <li class="list-group-item">Lumerical</li>
+        <li class="list-group-item">MAGMA</li>
+        <li class="list-group-item">MANOA</li>
+        <li class="list-group-item">MARS</li>
+        <li class="list-group-item">MATLAB</li>
+        <li class="list-group-item">MDSplus</li>
+        <li class="list-group-item">MNova</li>
+        <li class="list-group-item">MOOSE</li>
+        <li class="list-group-item">MOTHUR</li>
+        <li class="list-group-item">MRBAYES</li>
+        <li class="list-group-item">MS Access</li>
+        <li class="list-group-item">MS Excel</li>
+        <li class="list-group-item">MS Office</li>
+        <li class="list-group-item">Macaulay2</li>
+        <li class="list-group-item">Magma</li>
+        <li class="list-group-item">Make</li>
+        <li class="list-group-item">MatLab</li>
+        <li class="list-group-item">Matab and its toolboxes</li>
+        <li class="list-group-item">Materials Studio</li>
+        <li class="list-group-item">Mathematica</li>
+        <li class="list-group-item">Matlab</li>
+        <li class="list-group-item">Matlab and Octave</li>
+        <li class="list-group-item">Matplotlib</li>
+        <li class="list-group-item">MestReNova</li>
+        <li class="list-group-item">Mestranova</li>
+        <li class="list-group-item">Microsoft Excel</li>
+        <li class="list-group-item">Microsoft Excell</li>
+        <li class="list-group-item">Microsoft Office</li>
+        <li class="list-group-item">Minitab</li>
+        <li class="list-group-item">Molcas</li>
+        <li class="list-group-item">Mostly R libraries and custom scripts</li>
+        <li class="list-group-item">Mplus</li>
+        <li class="list-group-item">MySQL</li>
+        <li class="list-group-item">N/A</li>
+        <li class="list-group-item">NASA's Global Climate Models</li>
+        <li class="list-group-item">NCAR command language</li>
+        <li class="list-group-item">NCL</li>
+        <li class="list-group-item">NCO and CDO operators</li>
+        <li class="list-group-item">NEMO5</li>
+        <li class="list-group-item">NLTK</li>
+        <li class="list-group-item">NVivo</li>
+        <li class="list-group-item">Naff for orbital frequency analysis</li>
+        <li class="list-group-item">NetLogo</li>
+        <li class="list-group-item">NetworkX</li>
+        <li class="list-group-item">Nikon Elements</li>
+        <li class="list-group-item">NovoExpress (ACEA)</li>
+        <li class="list-group-item">Numpy</li>
+        <li class="list-group-item">Nvivo</li>
+        <li class="list-group-item">OPUS</li>
+        <li class="list-group-item">ORCA</li>
+        <li class="list-group-item">ORIGIN</li>
+        <li class="list-group-item">OTO: ontology term organizer</li>
+        <li class="list-group-item">Octave</li>
+        <li class="list-group-item">Open Heat Map</li>
+        <li class="list-group-item">OpenFOAM</li>
+        <li class="list-group-item">OpenMD (our group code)</li>
+        <li class="list-group-item">OpenRefine</li>
+        <li class="list-group-item">Operational and research models</li>
+        <li class="list-group-item">Origin</li>
+        <li class="list-group-item">Oxcal (Oxford Radiocarbon Lab)</li>
+        <li class="list-group-item">PASTA</li>
+        <li class="list-group-item">PAUP</li>
+        <li class="list-group-item">PAUP*</li>
+        <li class="list-group-item">PC-Ord</li>
+        <li class="list-group-item">PERTURBO</li>
+        <li class="list-group-item">PHP and MySQL</li>
+        <li class="list-group-item">PINY_MD</li>
+        <li class="list-group-item">PORTA</li>
+        <li class="list-group-item">PRIMER+</li>
+        <li class="list-group-item">PYTHON</li>
+        <li class="list-group-item">Paleobiology Database</li>
+        <li class="list-group-item">Paleomag / and PmagPy</li>
+        <li class="list-group-item">Panorama by Provue</li>
+        <li class="list-group-item">ParaView</li>
+        <li class="list-group-item">Paup*</li>
+        <li class="list-group-item">Pgplot</li>
+        <li class="list-group-item">Phenix, Coot, etc</li>
+        <li class="list-group-item">Photoshop</li>
+        <li class="list-group-item">Phyluce</li>
+        <li class="list-group-item">Plexon Omniplex Software</li>
+        <li class="list-group-item">Praat</li>
+        <li class="list-group-item">PyMOL</li>
+        <li class="list-group-item">PyMOL and ProMOL</li>
+        <li class="list-group-item">PySB</li>
+        <li class="list-group-item">Pyhon, pandas, numpy, etc</li>
+        <li class="list-group-item">Pymol</li>
+        <li class="list-group-item">Pythin</li>
+        <li class="list-group-item">Python</li>
+        <li class="list-group-item">Python (Numpy, Scipy, Matplotlib, Pandas)</li>
+        <li class="list-group-item">Python SciPy Stack</li>
+        <li class="list-group-item">Python and Python open source Python libraries</li>
+        <li class="list-group-item">Python and its libraries</li>
+        <li class="list-group-item">Python packages such as NLTK, networkx</li>
+        <li class="list-group-item">Python, C++ compilers</li>
+        <li class="list-group-item">Python, Jupyter</li>
+        <li class="list-group-item">Python-based code:  scipy and specialized astronomical packages</li>
+        <li class="list-group-item">Python/Numpy/Scipy</li>
+        <li class="list-group-item">Python/SciKit</li>
+        <li class="list-group-item">Python/anaconda</li>
+        <li class="list-group-item">Q-Chem</li>
+        <li class="list-group-item">QIIME</li>
+        <li class="list-group-item">Qiime</li>
+        <li class="list-group-item">QtiPlot</li>
+        <li class="list-group-item">Qual software tools</li>
+        <li class="list-group-item">Qualtrics</li>
+        <li class="list-group-item">R</li>
+        <li class="list-group-item">R  (esp. packages psych and lavaan)</li>
+        <li class="list-group-item">R (many packages)</li>
+        <li class="list-group-item">R (statistics)</li>
+        <li class="list-group-item">R AIC modeling</li>
+        <li class="list-group-item">R Studio</li>
+        <li class="list-group-item">R and R packages</li>
+        <li class="list-group-item">R libraries</li>
+        <li class="list-group-item">R packages</li>
+        <li class="list-group-item">R statistical software</li>
+        <li class="list-group-item">R statistical software packages</li>
+        <li class="list-group-item">R statistics</li>
+        <li class="list-group-item">R stats</li>
+        <li class="list-group-item">R+ packages</li>
+        <li class="list-group-item">R-based packages for phylogenetics (ape)</li>
+        <li class="list-group-item">R/R Studio</li>
+        <li class="list-group-item">RAMS (https://en.wikipedia.org/wiki/Regional_Atmospheric_Modeling_System)</li>
+        <li class="list-group-item">ROMS</li>
+        <li class="list-group-item">ROOT</li>
+        <li class="list-group-item">ROOT data analysis software (root.cern.ch)</li>
+        <li class="list-group-item">RapidMiner</li>
+        <li class="list-group-item">RoboMongo</li>
+        <li class="list-group-item">Root</li>
+        <li class="list-group-item">Root/Roofit/PyRoot</li>
+        <li class="list-group-item">Rstudio</li>
+        <li class="list-group-item">Rstudio (esp. Bioconductor packages)</li>
+        <li class="list-group-item">SAMtools</li>
+        <li class="list-group-item">SAOimage/ds9</li>
+        <li class="list-group-item">SAS</li>
+        <li class="list-group-item">SCIRun</li>
+        <li class="list-group-item">SPREAD SHEETS</li>
+        <li class="list-group-item">SPSS</li>
+        <li class="list-group-item">SPSS/AMOS</li>
+        <li class="list-group-item">SPike 2</li>
+        <li class="list-group-item">SQL Server</li>
+        <li class="list-group-item">STATA</li>
+        <li class="list-group-item">Sage</li>
+        <li class="list-group-item">SageMath</li>
+        <li class="list-group-item">Samtools</li>
+        <li class="list-group-item">SciPy</li>
+        <li class="list-group-item">SciStat</li>
+        <li class="list-group-item">Scipy software stack</li>
+        <li class="list-group-item">Seismic Analysis Tool</li>
+        <li class="list-group-item">Sequel Pro</li>
+        <li class="list-group-item">SigmaPlot</li>
+        <li class="list-group-item">SigmaPlot / Sigma Stat</li>
+        <li class="list-group-item">Sigmaplot</li>
+        <li class="list-group-item">Simca</li>
+        <li class="list-group-item">Software that I write</li>
+        <li class="list-group-item">SolarSoft/IDL</li>
+        <li class="list-group-item">Solo3</li>
+        <li class="list-group-item">Spss</li>
+        <li class="list-group-item">Stanford NER system</li>
+        <li class="list-group-item">Star-CCM+</li>
+        <li class="list-group-item">Stata</li>
+        <li class="list-group-item">Statistica</li>
+        <li class="list-group-item">StickWRLD</li>
+        <li class="list-group-item">Studiocode</li>
+        <li class="list-group-item">SurveyMonkey</li>
+        <li class="list-group-item">Symbiota</li>
+        <li class="list-group-item">Systat</li>
+        <li class="list-group-item">Systematic Analysis of Language Transcripts</li>
+        <li class="list-group-item">TEI markup</li>
+        <li class="list-group-item">TEOS-10</li>
+        <li class="list-group-item">TURBOVEG</li>
+        <li class="list-group-item">Tableau</li>
+        <li class="list-group-item">Tabulator</li>
+        <li class="list-group-item">The R Project for Statistical Computing</li>
+        <li class="list-group-item">The Unscrambler</li>
+        <li class="list-group-item">The Weather Research and Forecasting (WRF) Model</li>
+        <li class="list-group-item">This is too broad a question</li>
+        <li class="list-group-item">Tilia</li>
+        <li class="list-group-item">Tools at nanoinfo.org</li>
+        <li class="list-group-item">TopSpin</li>
+        <li class="list-group-item">TreeCorr</li>
+        <li class="list-group-item">Trilinos</li>
+        <li class="list-group-item">TurningPoint</li>
+        <li class="list-group-item">Tuxedo suite</li>
+        <li class="list-group-item">UCSC genome browser</li>
+        <li class="list-group-item">VASP</li>
+        <li class="list-group-item">VHDL</li>
+        <li class="list-group-item">VMD</li>
+        <li class="list-group-item">Varian/Agilent VNMRJ</li>
+        <li class="list-group-item">Vasp</li>
+        <li class="list-group-item">Vicon Blade</li>
+        <li class="list-group-item">VisIT</li>
+        <li class="list-group-item">VisIt (LLNL)</li>
+        <li class="list-group-item">Vortex</li>
+        <li class="list-group-item">WEKA tools</li>
+        <li class="list-group-item">WRF-CHEM</li>
+        <li class="list-group-item">Weka</li>
+        <li class="list-group-item">Weka / Tensorflow</li>
+        <li class="list-group-item">WinUV</li>
+        <li class="list-group-item">Xcode</li>
+        <li class="list-group-item">Zoho</li>
+        <li class="list-group-item">a variety of programs in R</li>
+        <li class="list-group-item">access</li>
+        <li class="list-group-item">ambertools</li>
+        <li class="list-group-item">anafora</li>
+        <li class="list-group-item">arcGIS</li>
+        <li class="list-group-item">arduino</li>
+        <li class="list-group-item">atlas.ti</li>
+        <li class="list-group-item">bash</li>
+        <li class="list-group-item">bash scripts</li>
+        <li class="list-group-item">bioformat</li>
+        <li class="list-group-item">biopython</li>
+        <li class="list-group-item">blast</li>
+        <li class="list-group-item">bowtie</li>
+        <li class="list-group-item">cern root, other cern libraries</li>
+        <li class="list-group-item">command line</li>
+        <li class="list-group-item">compilers & performance libraries, e.g., gfortran, gcc, mpi</li>
+        <li class="list-group-item">comsol</li>
+        <li class="list-group-item">custom data reduction code</li>
+        <li class="list-group-item">custom python scripts</li>
+        <li class="list-group-item">daisy lab</li>
+        <li class="list-group-item">dcfldd</li>
+        <li class="list-group-item">dedoose</li>
+        <li class="list-group-item">don't understand</li>
+        <li class="list-group-item">dplyr</li>
+        <li class="list-group-item">elastic search and other indexers</li>
+        <li class="list-group-item">electronic structure codes</li>
+        <li class="list-group-item">excel</li>
+        <li class="list-group-item">excel/spreadsheets</li>
+        <li class="list-group-item">gcc compiler</li>
+        <li class="list-group-item">github</li>
+        <li class="list-group-item">gnuplot</li>
+        <li class="list-group-item">homemade</li>
+        <li class="list-group-item">iPython / Jupyter</li>
+        <li class="list-group-item">iPython notebooks</li>
+        <li class="list-group-item">idel/python</li>
+        <li class="list-group-item">idl</li>
+        <li class="list-group-item">igor</li>
+        <li class="list-group-item">igor pro</li>
+        <li class="list-group-item">imageJ</li>
+        <li class="list-group-item">in-hourse developed software</li>
+        <li class="list-group-item">in-house, custom</li>
+        <li class="list-group-item">ipsumdump</li>
+        <li class="list-group-item">iraf</li>
+        <li class="list-group-item">iraf/pyraf</li>
+        <li class="list-group-item">java</li>
+        <li class="list-group-item">javascript</li>
+        <li class="list-group-item">kaleidaGraph</li>
+        <li class="list-group-item">keysight ICCAP</li>
+        <li class="list-group-item">labview</li>
+        <li class="list-group-item">latex</li>
+        <li class="list-group-item">mathematica</li>
+        <li class="list-group-item">matlab</li>
+        <li class="list-group-item">matplotlib</li>
+        <li class="list-group-item">matplotlib/pyton</li>
+        <li class="list-group-item">mestrenova</li>
+        <li class="list-group-item">microsoft excel</li>
+        <li class="list-group-item">migrate-n</li>
+        <li class="list-group-item">miscrosoft</li>
+        <li class="list-group-item">mothur</li>
+        <li class="list-group-item">my own code for solving kinetic equations of gas dynamics</li>
+        <li class="list-group-item">my own software</li>
+        <li class="list-group-item">ncl</li>
+        <li class="list-group-item">ncss</li>
+        <li class="list-group-item">netlogo</li>
+        <li class="list-group-item">nipype</li>
+        <li class="list-group-item">numerical packages</li>
+        <li class="list-group-item">numpy, scipy, scikit-learn</li>
+        <li class="list-group-item">nwchem</li>
+        <li class="list-group-item">octave</li>
+        <li class="list-group-item">origin</li>
+        <li class="list-group-item">originpro</li>
+        <li class="list-group-item">orion (radiation-magnetohydrodynamics code developed by a consortium)</li>
+        <li class="list-group-item">our own Python code</li>
+        <li class="list-group-item">ovito</li>
+        <li class="list-group-item">own programs</li>
+        <li class="list-group-item">paraview</li>
+        <li class="list-group-item">perl</li>
+        <li class="list-group-item">powerworld</li>
+        <li class="list-group-item">program R</li>
+        <li class="list-group-item">proprietary software</li>
+        <li class="list-group-item">proprietory</li>
+        <li class="list-group-item">pySPACE</li>
+        <li class="list-group-item">python</li>
+        <li class="list-group-item">python (numpy, scipy, matplotlib)</li>
+        <li class="list-group-item">python and libraries</li>
+        <li class="list-group-item">python custom codes</li>
+        <li class="list-group-item">python notebooks</li>
+        <li class="list-group-item">python scripts</li>
+        <li class="list-group-item">python/numpy</li>
+        <li class="list-group-item">python/numpy/matplotlib</li>
+        <li class="list-group-item">python/scipy</li>
+        <li class="list-group-item">r</li>
+        <li class="list-group-item">r programming environment</li>
+        <li class="list-group-item">real essi simulator</li>
+        <li class="list-group-item">root</li>
+        <li class="list-group-item">sage</li>
+        <li class="list-group-item">sas</li>
+        <li class="list-group-item">scikit-learn</li>
+        <li class="list-group-item">sequence alignment programs</li>
+        <li class="list-group-item">sigmaplot</li>
+        <li class="list-group-item">snakemake</li>
+        <li class="list-group-item">spreadsheet - Excel</li>
+        <li class="list-group-item">sps</li>
+        <li class="list-group-item">spss</li>
+        <li class="list-group-item">stacks</li>
+        <li class="list-group-item">standard tools like Exel, SigmaPlot, SAS</li>
+        <li class="list-group-item">stata</li>
+        <li class="list-group-item">suitesparse.com</li>
+        <li class="list-group-item">survey monkey</li>
+        <li class="list-group-item">tcptrace</li>
+        <li class="list-group-item">too many to list</li>
+        <li class="list-group-item">toolboxes in python</li>
+        <li class="list-group-item">tools I have created</li>
+        <li class="list-group-item">trackpy</li>
+        <li class="list-group-item">tuxedo suite</li>
+        <li class="list-group-item">various C/C++ libraries</li>
+        <li class="list-group-item">various companies that produce sensors</li>
+        <li class="list-group-item">various phylogenetic inference tools</li>
+        <li class="list-group-item">velvet</li>
+        <li class="list-group-item">visit</li>
+        <li class="list-group-item">visual basic</li>
+        <li class="list-group-item">vtk</li>
+        <li class="list-group-item">website building tools</li>
+        <li class="list-group-item">xBio:D</li>
+        <li class="list-group-item">xmgrace</li>
+        <li class="list-group-item">yt</li>
+        <li class="list-group-item">zeiss axiovision</li>
+
+</ul>
+
+        <hr>
+        <h1>Developer Behavior</h1>
+
+        <h3>The next questions are for those who develop, administer or maintain software and/or 
+systems used to share, publish or preserve data or software. Are these sorts of tasks your 
+responsibility?
+    <small class="text-muted">(dev)</small>
+        </h3>
+        <div id="dev" class="pie"></div>
+
+    <script>make_pie('dev', [
+['Yes', 213],
+['Occasionally', 276],
+['Never', 798],
+//['No answer', 567]
+]);
+    </script>
+
+    <h3>Do you collaboratively develop and/or publicly share code in an version 
+        control repository like GitHub or bitbucket?
+    <small class="text-muted">(dev_code_verCon)</small>
+    </h3>
+
+    <div id="dev_code_verCon" class="pie"></div>
+
+    <script>make_pie_categorical('dev_code_verCon', [
+['Yes, collaboratively develop and publicly share in a code repository', 112],
+['Yes, manage in a code repository but don\'t make public', 47],
+['No, it\'s all managed at the team or dev level internally on developer machines or our local filesystems', 73],
+['No, I only distribute binaries', 16],
+['Prefer not to Answer', 19],
+//['No answer', 9]
+]);
+    </script>
+
+    <h3>Do you develop, administer, maintain or support any (select any that apply):
+    <small class="text-muted">(dev_sw_dams)</small>
+    </h3>
+    <div id="dev_sw_dams"></div>
+
+    <script>
+        var dev_sw_dams = c3.generate({
+            bindto: "#dev_sw_dams",
+            axis: {
+                x: { type: 'category'},
+                y: { label: "Count" }
+            },
+            data: {
+                type: 'bar',
+                order: null,
+                x: 'x',
+                colors: {
+                    Develop: colorlist_categorical[3],
+                    Administer: colorlist_categorical[2],
+                    Maintain: colorlist_categorical[1],
+                    Support: colorlist_categorical[0]
+                },
+                rows:[
+                    ['x', 'Develop', 'Administer', 'Maintain', 'Support'],
+                    ['Share', 39, 51, 46, 43],
+                    ['Publish or cite', 18, 33, 25, 28],
+                    ['Preserve', 24, 38, 38, 38],
+                    ['Other', 86, 64, 67, 64]
+]}});
+    </script>
+
+    <h3>How long do you expect people to use the software you
+develop, administer, 
+maintain or support ?
+    <small class="text-muted">(dev_sw_eol)</small>
+    </h3>
+    <div id="dev_sw_eol" class="pie"></div>
+
+    <script>make_pie_sequential('dev_sw_eol', [
+['>10 years', 48],
+['10 years', 15],
+['5-10 years', 104],
+['less than 5 years', 78]
+//['No answer', 31]
+]);
+    </script>
+
+    <h3>For the typical software you
+develop, administer, maintain or support, how 
+many users are there:
+    <small class="text-muted">(dev_user_count)</small>
+    </h3>
+    <div id="dev_user_count" class="pie"></div>
+
+    <script>make_pie_sequential('dev_user_count', [
+['over 50,000 users', 3],
+['over 10,000 users', 6],
+['over 1000 users', 13],
+['500-1000 users', 19],
+['More than 50, less than 500 users', 55],
+['less than 50 users', 141]
+//['No answer', 39]
+]);
+    </script>
+
+    <h3>How do you typically license the software you develop? Select all that apply:
+    <small class="text-muted">(dev_license)</small>
+    </h3>
+    <div id="dev_license"></div>
+
+    <script>
+        var dev_license = c3.generate({
+            bindto: "#dev_license",
+            axis: {
+                x: { type: 'category'},
+                y: { label: 'Count'}
+            },
+            legend: { show: false },
+            data: {
+                type: 'bar',
+                colors: {
+                    Count: colorlist[0][0]
+                },
+                order: null,
+                x: 'x',
+                rows:[
+                    ['x', 'Count'],
+                    ['GPL', 87],
+                    ['CC', 50],
+                    ['Apache', 23],
+                    ['MIT', 34],
+                    ['Other', 35]
+]}});
+     </script>
+
+     Some of the licenses mentioned in <em>Other</em>:
+     <ul class="list-group">
+         <li class="list-group-item">BSD (includes BSD 3-clause, and BSD3)</li>
+         <li class="list-group-item">Apache</li>
+         <li class="list-group-item">Not licensed</li>
+         <li class="list-group-item">n/a</li>
+     </ul>
+
+<h3>Have you containerized any code to make sharing or distribution easier?
+    <small class="text-muted">(dev_code_container)</small>
+</h3>
+<div id="dev_code_container" class="pie"></div>
+
+    <script>make_pie('dev_code_container', [['Yes', 33], ['No', 92]]);
+    </script>
+
+    </div>
+    </body>
+</html>
