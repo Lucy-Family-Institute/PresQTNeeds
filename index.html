@@ -196,7 +196,7 @@ var make_tools_bar = function(id, datalist, showlegend) {
 
         <h2>Tools/Usefulness/Sort</h2>
 
-        <h4>1. Indicate whether implementation or integration of tools like those below would 
+        <h4 id="q1">1. Indicate whether implementation or integration of tools like those below would 
 ease your path to publishing, sharing, curating, or reusing data or software:
         <small class="text-muted">(tools_use_matrix)</small>
         </h4>
@@ -311,7 +311,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
     ], true)
 </script>
 
-        <h4>2. Do you have a data or software preservation quality tool need this project could help you develop? If so, please describe:
+        <h4 id="q2">2. Do you have a data or software preservation quality tool need this project could help you develop? If so, please describe:
         <small class="text-muted">(tools_data_preserv)</small>
         </h4>
 
@@ -589,7 +589,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 
         </ul>
 
-        <h4>3. Is there a tool gap in your digital ecosystem or workflow?
+        <h4 id="q3">3. Is there a tool gap in your digital ecosystem or workflow?
             <small class="text-muted">(tools_gap)</small>
         </h4>
 
@@ -932,7 +932,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
         <h2>Researcher Behavior</h2>
 
         <div class="pair">
-        <h4 style="margin-top:20px">4. How familiar are you with tools used to share, publish, cite and preserve data or software?
+        <h4 id="q4" style="margin-top:20px">4. How familiar are you with tools used to share, publish, cite and preserve data or software?
         <small class="text-muted">(res)</small>
         </h4>
         <div id="res" class="pie"></div>
@@ -948,7 +948,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
     </script>
         </div>
 
-    <h4>5. Do you anticipate publishing or sharing your own data or code over the next five years?
+    <h4 id="q5">5. Do you anticipate publishing or sharing your own data or code over the next five years?
     <small class="text-muted">(res_pubshare_5)</small>
     </h4>
             <div id="res_pubshare_5" class="pie"></div>
@@ -963,7 +963,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>6. In the past, how often have you made your research data free to access, reuse, repurpose, and redistribute?
+    <h4 id="q6">6. In the past, how often have you made your research data free to access, reuse, repurpose, and redistribute?
     <small class="text-muted">(res_open_data)</small>
     </h4>
     <div id="res_open_data" class="pie"></div>
@@ -978,7 +978,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>7. Is any of your data or code published or shared now on a repository or website?
+    <h4 id="q7">7. Is any of your data or code published or shared now on a repository or website?
     <small class="text-muted">(res_pubshare)</small>
     </h4>
     <div id="res_pubshare" class="pie"></div>
@@ -993,7 +993,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>8. In the past three years, have you or your research group made publicly accessible the following items through your or your institution's website or a third-party repository?
+    <h4 id="q8">8. In the past three years, have you or your research group made publicly accessible the following items through your or your institution's website or a third-party repository?
     <small class="text-muted">(res_open_data3)</small>
     </h4>
     <div id="res_open_data3"></div>
@@ -1018,7 +1018,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]}});
     </script>
 
-    <h4>9. Do you need better tools to share, re-use, cite, publish or preserve your own or others' Data and/or Software?
+    <h4 id="q9">9. Do you need better tools to share, re-use, cite, publish or preserve your own or others' Data and/or Software?
     <small class="text-muted">(res_tools_share)</small>
     </h4>
     <div id="res_tools_share"></div>
@@ -1050,7 +1050,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]}});
     </script>
 
-    <h4>10. When asked to submit keywords to describe your own or others' research is it usually:
+    <h4 id="q10">10. When asked to submit keywords to describe your own or others' research is it usually:
     <small class="text-muted">(res_keywords)</small>
     </h4>
     <div id="res_keywords" class="pie"></div>
@@ -1066,7 +1066,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>11. When asked to submit keywords to describe your own or others' resarch how accurately do the terms available usually describe your work?
+    <h4 id="q11">11. When asked to submit keywords to describe your own or others' resarch how accurately do the terms available usually describe your work?
     <small class="text-muted">(res_keywords_avail)</small>
     </h4>
     <div id="res_keywords_avail" class="pie"></div>
@@ -1082,7 +1082,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>12. Does your employer require you to make any of your publications or data 
+    <h4 id="q12">12. Does your employer require you to make any of your publications or data 
         openly available?
     <small class="text-muted">(res_employ_open)</small>
     </h4>
@@ -1097,7 +1097,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>13. Do any of the organizations who fund your work require you to make any of your
+    <h4 id="q13">13. Do any of the organizations who fund your work require you to make any of your
         publications or data openly available?
     <small class="text-muted">(res_fund_open)</small>
     </h4>
@@ -1112,7 +1112,7 @@ ease your path to publishing, sharing, curating, or reusing data or software:
 ]);
     </script>
 
-    <h4>14. Please name the software/tools use use most to share, publish or preserve your 
+    <h4 id="q14">14. Please name the software/tools use use most to share, publish or preserve your 
 research
     <small class="text-muted">(res_open_tool)</small>
     </h4>
@@ -1328,7 +1328,7 @@ research
 
     </ul>
 
-    <h4>15. In your estimation, which of the following currently have the infrastructure 
+    <h4 id="q15">15. In your estimation, which of the following currently have the infrastructure 
 required   to provide long-term public
 access to your research data?
     <small class="text-muted">(res_pub_infrastruct)</small>
@@ -1360,7 +1360,7 @@ access to your research data?
 ]}});
     </script>
 
-    <h4>16. Do you actively create and manage metadata to make sharing, finding, or 
+    <h4 id="q16">16. Do you actively create and manage metadata to make sharing, finding, or 
         documenting provenance of your own or others' data or code easier?
     <small class="text-muted">(res_metadata)</small>
     </h4>
@@ -1378,7 +1378,7 @@ access to your research data?
 ]);
     </script>
 
-    <h4>17. How important to your work are Web-based applications that provide access to the 
+    <h4 id="q17">17. How important to your work are Web-based applications that provide access to the 
 following specialized resources?
     <small class="text-muted">(res_tools)</small>
     </h4>
@@ -1421,7 +1421,7 @@ following specialized resources?
 
     </script>
 
-    <h4>18. Do you create and/or use software, code, or scripts in your research?
+    <h4 id="q18">18. Do you create and/or use software, code, or scripts in your research?
     <small class="text-muted">(res_code)</small>
     </h4>
     <div id="res_code" class="pie"></div>
@@ -1436,7 +1436,7 @@ following specialized resources?
 ]);
     </script>
 
-    <h4>19. Have you ever authored software, code or scripts to analyze or produce your 
+    <h4 id="q19">19. Have you ever authored software, code or scripts to analyze or produce your 
         data?
     <small class="text-muted">(res_author_sw)</small>
     </h4>
@@ -1451,7 +1451,7 @@ following specialized resources?
     </script>
 
 
-    <h4>20. Have you ever hired or supervised someone to author software code or scripts 
+    <h4 id="q20">20. Have you ever hired or supervised someone to author software code or scripts 
         to analyze or produce your data?
     <small class="text-muted">(res_hire_swdev)</small>
     </h4>
@@ -1466,7 +1466,7 @@ following specialized resources?
     </script>
 
 
-    <h4>21. For others to reproduce your results would they need your software, code or scripts?
+    <h4 id="q21">21. For others to reproduce your results would they need your software, code or scripts?
     <small class="text-muted">(res_reproduce)</small>
     </h4>
     <div id="res_reproduce" class="pie"></div>
@@ -1481,7 +1481,7 @@ following specialized resources?
 ]);
     </script>
 
-    <h4>22. Do you use or revise commercial and/or freeware software, scripts, or tools to 
+    <h4 id="q22">22. Do you use or revise commercial and/or freeware software, scripts, or tools to 
 analyze or produce your data more often than writing new code or hiring someone to write 
 custom software to analyze or produce data for your project(s)?
     <small class="text-muted">(res_external_sw)</small>
@@ -1498,7 +1498,7 @@ custom software to analyze or produce data for your project(s)?
 ]);
     </script>
 
-    <h4>23. Please name some of the software/tools you use most to analyze or 
+    <h4 id="q23">23. Please name some of the software/tools you use most to analyze or 
 produce your data
     <small class="text-muted">(res_external_sw_name)</small>
     </h4>
@@ -1979,7 +1979,7 @@ produce your data
         <hr>
         <h2>Developer Behavior</h2>
 
-        <h4>24. The next questions are for those who develop, administer or maintain software and/or 
+        <h4 id="q24">24. The next questions are for those who develop, administer or maintain software and/or 
 systems used to share, publish or preserve data or software. Are these sorts of tasks your 
 responsibility?
     <small class="text-muted">(dev)</small>
@@ -1994,7 +1994,7 @@ responsibility?
 ]);
     </script>
 
-    <h4>25. Do you collaboratively develop and/or publicly share code in an version 
+    <h4 id="q25">25. Do you collaboratively develop and/or publicly share code in an version 
         control repository like GitHub or bitbucket?
     <small class="text-muted">(dev_code_verCon)</small>
     </h4>
@@ -2011,7 +2011,7 @@ responsibility?
 ]);
     </script>
 
-    <h4>26. Do you develop, administer, maintain or support any (select any that apply):
+    <h4 id="q26">26. Do you develop, administer, maintain or support any (select any that apply):
     <small class="text-muted">(dev_sw_dams)</small>
     </h4>
     <div id="dev_sw_dams"></div>
@@ -2042,7 +2042,7 @@ responsibility?
 ]}});
     </script>
 
-    <h4>27. How long do you expect people to use the software you
+    <h4 id="q27">27. How long do you expect people to use the software you
 develop, administer, 
 maintain or support ?
     <small class="text-muted">(dev_sw_eol)</small>
@@ -2058,7 +2058,7 @@ maintain or support ?
 ]);
     </script>
 
-    <h4>28. For the typical software you
+    <h4 id="q28">28. For the typical software you
 develop, administer, maintain or support, how 
 many users are there:
     <small class="text-muted">(dev_user_count)</small>
@@ -2076,7 +2076,7 @@ many users are there:
 ]);
     </script>
 
-    <h4>29. How do you typically license the software you develop? Select all that apply:
+    <h4 id="q29">29. How do you typically license the software you develop? Select all that apply:
     <small class="text-muted">(dev_license)</small>
     </h4>
     <div id="dev_license"></div>
@@ -2114,7 +2114,7 @@ many users are there:
          <li class="list-group-item">n/a</li>
      </ul>
 
-<h4>30. Have you containerized any code to make sharing or distribution easier?
+<h4 id="q30">30. Have you containerized any code to make sharing or distribution easier?
     <small class="text-muted">(dev_code_container)</small>
 </h4>
 <div id="dev_code_container" class="pie"></div>
